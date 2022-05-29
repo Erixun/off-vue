@@ -1,4 +1,3 @@
-
 type ProductNutriments = {
   energy_kj: number;
   energy_kj_unit: string;

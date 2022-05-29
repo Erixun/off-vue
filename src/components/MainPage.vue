@@ -2,9 +2,12 @@
   <div class="container" :class="{ 'no-scroll': state.selectedProduct }">
     <header>
       <h1>Goud</h1>
-      <h2><i>rated foods for the common good</i></h2>
+      <h2><i>rated foods for common good</i></h2>
       <div class="header-bg"></div>
     </header>
+    <div class="spinner-backdrop" v-if="state.isGettingFood">
+      <div class="spinner"></div>
+    </div>
     <main>
       <div class="control-panel">
         <div class="field-search" v-if="state.selectedCategory === null">
@@ -22,7 +25,7 @@
                 v-show="state.searchTerm && state.hasExecutedSearch"
                 :disabled="!(state.searchTerm && state.hasExecutedSearch)"
                 class="btn-goud abs x"
-                @click="clearSearch()"
+                @click="resetToDefault()"
               >
                 &times;
               </button>
@@ -34,7 +37,7 @@
         </div>
         <h3 v-else class="category-header">
           Category - {{ state.selectedCategory.name }}
-          <button class="btn-goud abs x" @click="clearCategory()">╳</button>
+          <button class="btn-goud abs x" @click="resetToDefault()">╳</button>
         </h3>
         <div class="field-country">
           <form @submit.prevent>
@@ -65,6 +68,7 @@
           </button>
           <button
             class="btn-categories btn-goud lefty"
+            disabled
             @click.stop="displayCategories()"
           >
             Options &lt;-|
@@ -117,6 +121,10 @@
           v-for="product of state.products"
           :key="product.id"
           @click="getProduct(product.code)"
+          @keyup.enter="getProduct(product.code)"
+          @keydown.space.prevent
+          @keyup.space="getProduct(product.code)"
+          tabindex="0"
           :title="product.product_name"
         >
           <div class="upper">
@@ -160,7 +168,7 @@
           </div>
         </li>
       </ul>
-      <p v-if="state.isLoading" class="load-text">Gathering foods...</p>
+      <p v-if="state.isGatheringFoods" class="load-text">Gathering foods...</p>
       <p
         v-else-if="state.products.length === 0 && state.hasExecutedSearch"
         class="no-result-msg"
@@ -168,7 +176,10 @@
         Sorry, no foods found...
       </p>
       <div class="page-list-wrapper">
-        <ol class="page-list" v-if="state.pages.length > 1 && !state.isLoading">
+        <ol
+          class="page-list"
+          v-if="state.pages.length > 1 && !state.isGatheringFoods"
+        >
           <li
             class="page"
             :class="{
@@ -184,7 +195,9 @@
         </ol>
       </div>
       <figure
-        v-if="!state.hasExecutedSearch && !hasProducts() && !state.isLoading"
+        v-if="
+          !state.hasExecutedSearch && !hasProducts() && !state.isGatheringFoods
+        "
       >
         <figcaption>An app based on</figcaption>
         <a href="https://world.openfoodfacts.org/" target="_blank">
@@ -201,8 +214,11 @@
     </main>
     <div
       class="product-view"
+      ref="productView"
       v-if="state.selectedProduct"
+      tabindex="0"
       @click="dismissProduct()"
+      @keyup.esc="dismissProduct()"
     >
       <div class="grid" :class="{ show: state.hasProductInView }" @click.stop>
         <button class="btn-dismiss" @click="dismissProduct()">╳</button>
@@ -219,10 +235,8 @@
         <figure class="figure-nutriscore">
           <img
             class="nutriscore-img"
-            :src="`https://static.openfoodfacts.org/images/attributes/nutriscore-${
-              state.selectedProduct.nutriscore_grade ?? 'unknown'
-            }.svg`"
-            alt=""
+            :src="`https://static.openfoodfacts.org/images/attributes/nutriscore-${productNutriscore}.svg`"
+            :alt="'Nutri-Score ' + productNutriscore"
           />
         </figure>
         <div class="grid-item nutrients">
@@ -237,8 +251,13 @@
               <tr>
                 <td class="n-label">Energy</td>
                 <td>
-                  {{ state.selectedProduct.nutriments.energy || "?" }} kJ ({{
-                    state.selectedProduct.nutriments["energy-kcal"] || "?"
+                  {{
+                    state.selectedProduct.nutriments.energy.toFixed(0) || "?"
+                  }}
+                  kJ ({{
+                    state.selectedProduct.nutriments["energy-kcal"]?.toFixed(
+                      0
+                    ) || "?"
                   }}
                   kcal)
                 </td>
@@ -250,7 +269,10 @@
                 }"
               >
                 <td class="n-label">Fat</td>
-                <td>{{ state.selectedProduct.nutriments.fat || "?" }} g</td>
+                <td>
+                  {{ +state.selectedProduct.nutriments.fat.toFixed(1) ?? "?" }}
+                  g
+                </td>
               </tr>
               <tr
                 :class="{
@@ -260,14 +282,23 @@
               >
                 <td class="n-label indented">Saturated fat</td>
                 <td>
-                  {{ state.selectedProduct.nutriments["saturated-fat"] || "?" }}
+                  {{
+                    +state.selectedProduct.nutriments["saturated-fat"].toFixed(
+                      1
+                    ) ?? "?"
+                  }}
                   g
                 </td>
               </tr>
               <tr>
                 <td class="n-label">Carbohydrates</td>
                 <td>
-                  {{ state.selectedProduct.nutriments.carbohydrates || "?" }} g
+                  {{
+                    +state.selectedProduct.nutriments.carbohydrates.toFixed(
+                      1
+                    ) ?? "?"
+                  }}
+                  g
                 </td>
               </tr>
               <tr
@@ -277,12 +308,20 @@
                 }"
               >
                 <td class="n-label indented">Sugars</td>
-                <td>{{ state.selectedProduct.nutriments.sugars || "?" }} g</td>
+                <td>
+                  {{
+                    +state.selectedProduct.nutriments.sugars.toFixed(1) ?? "?"
+                  }}
+                  g
+                </td>
               </tr>
               <tr>
                 <td class="n-label">Proteins</td>
                 <td>
-                  {{ state.selectedProduct.nutriments.proteins || "?" }} g
+                  {{
+                    +state.selectedProduct.nutriments.proteins.toFixed(1) ?? "?"
+                  }}
+                  g
                 </td>
               </tr>
               <tr
@@ -292,7 +331,10 @@
                 }"
               >
                 <td class="n-label">Salt</td>
-                <td>{{ state.selectedProduct.nutriments.salt || "?" }} g</td>
+                <td>
+                  {{ +state.selectedProduct.nutriments.salt.toFixed(2) ?? "?" }}
+                  g
+                </td>
               </tr>
             </tbody>
           </table>
@@ -317,14 +359,7 @@
                 ingredient.replace(/_/g, "")
               }}</strong>
               <span v-else>{{ ingredient }}</span>
-              <!-- {{ ingredient }} -->
             </template>
-            <!-- {{ ingredients }} -->
-            <!-- {{
-              state.selectedProduct.ingredients_text_en ||
-              state.selectedProduct.ingredients_text ||
-              "Unavailable..."
-            }} -->
           </p>
         </div>
         <div class="grid-item">
@@ -335,7 +370,9 @@
               alt=""
             />
             <figcaption class="figc-eco">
-              This product has a
+              This product has a{{
+                state.selectedProduct.ecoscore_score ? "" : "n"
+              }}
               {{ describeEcoScore(state.selectedProduct.ecoscore_grade) }}
               impact on the environment
             </figcaption>
@@ -378,6 +415,7 @@ import {
 import OFFApi from "@/OFFApi/OFFApi";
 import countries from "@/assets/countries.json";
 import categories from "@/assets/categories.json";
+import NullProductsResponse from "@/constant/NullProductsResponse";
 
 export default defineComponent({
   props: {
@@ -395,9 +433,10 @@ export default defineComponent({
       categories: Array<Tag>;
       selectedCategory: null | Tag;
       searchTerm: null;
-      searchCategoryTerm: null;
+      searchCategoryTerm: null | string;
       products: Array<Product>;
-      isLoading: boolean;
+      isGatheringFoods: boolean;
+      isGettingFood: boolean;
       hasExecutedSearch: boolean;
       allPages: string[];
       pages: string[];
@@ -414,7 +453,8 @@ export default defineComponent({
       searchTerm: null,
       searchCategoryTerm: null,
       products: Array<Product>(),
-      isLoading: false,
+      isGatheringFoods: false,
+      isGettingFood: false,
       hasExecutedSearch: false,
       allPages: [],
       pages: [],
@@ -443,7 +483,7 @@ export default defineComponent({
     const initLoading = () => {
       state.hasExecutedSearch = true;
       state.products = [];
-      state.isLoading = true;
+      state.isGatheringFoods = true;
     };
 
     const execSearch = async (page = 1) => {
@@ -455,10 +495,13 @@ export default defineComponent({
         state.searchTerm,
         page,
         countryId
-      );
+      ).catch((e) => {
+        console.error(e);
+        return NullProductsResponse;
+      });
 
       if (response.products.length === 0) {
-        state.isLoading = false;
+        state.isGatheringFoods = false;
         return;
       }
 
@@ -473,7 +516,7 @@ export default defineComponent({
 
       handlePages(response);
 
-      state.isLoading = false;
+      state.isGatheringFoods = false;
       state.lastRequest = "search";
     };
 
@@ -533,9 +576,12 @@ export default defineComponent({
     };
 
     const filterCategories = () => {
+      if (!state.searchCategoryTerm) return;
       state.categories = categories.tags.filter(
         (t) =>
-          t.name.includes(state.searchCategoryTerm ?? "") &&
+          t.name
+            .toLocaleLowerCase()
+            .includes(state.searchCategoryTerm?.toLocaleLowerCase() ?? "") &&
           t.id.startsWith("en:") &&
           t.products > 1000
       );
@@ -567,8 +613,11 @@ export default defineComponent({
           );
           if (page === 1) handlePages(response);
         })
+        .catch((e) => {
+          console.error(e);
+        })
         .finally(() => {
-          state.isLoading = false;
+          state.isGatheringFoods = false;
           state.currentPage = page;
           state.lastRequest = "category";
         });
@@ -589,6 +638,7 @@ export default defineComponent({
     };
 
     const getProduct = async (barCode: string) => {
+      state.isGettingFood = true;
       await OFF.findProductByBarcode(barCode)
         .then((response) => {
           console.log(response);
@@ -604,20 +654,16 @@ export default defineComponent({
         });
 
       setTimeout(() => {
+        state.isGettingFood = false;
         state.hasProductInView = true;
+        productView.value?.focus();
       }, 0);
     };
 
     const hideCategories = () => (state.canShowCategories = false);
-    const clearCategory = () => {
-      state.selectedCategory = null;
-      state.hasExecutedSearch = false;
-      state.products = [];
-      state.pages = [];
-      state.currentPage = 1;
-    };
 
-    const clearSearch = () => {
+    const resetToDefault = () => {
+      state.selectedCategory = null;
       state.searchTerm = null;
       state.hasExecutedSearch = false;
       state.products = [];
@@ -651,8 +697,10 @@ export default defineComponent({
       }
     };
     const categorySearch = ref<null | HTMLInputElement>(null);
+    const productView = ref<null | HTMLDivElement>(null);
     return {
       categorySearch,
+      productView,
       state,
       nutriments: computed(
         () => state.selectedProduct?.nutriments as Nutriments
@@ -669,7 +717,7 @@ export default defineComponent({
           /\s?_[^_]+_{1}|((?<![\s|(]_)[^_]+(?!_))/g
         );
         console.log(matchedIngredients);
-        return matchedIngredients;
+        return matchedIngredients ?? ["Unknown..."];
       }),
       nova: computed(() => {
         const group = state.selectedProduct?.nova_group;
@@ -682,11 +730,19 @@ export default defineComponent({
             ? "Processed food"
             : group === 4
             ? "Ultra-processed food or drink product"
-            : "Nova-group not specified";
+            : "Degree of food-processing unknown";
         return {
           group,
           description,
         };
+      }),
+      productNutriscore: computed(() => {
+        if (!state.selectedProduct) return;
+        return (
+          state.selectedProduct.nutriscore_grade ??
+          state.selectedProduct.nutrition_grades_tags![0] ??
+          "unknown"
+        );
       }),
       describeEcoScore,
       getPage,
@@ -698,8 +754,7 @@ export default defineComponent({
       getProduct,
       getProductsByCategory,
       handleCountryChange,
-      clearSearch,
-      clearCategory,
+      resetToDefault,
       hasCleared,
       hasProducts,
       dismissProduct,
@@ -722,6 +777,36 @@ $goud-beige: var(--goud-beige);
   height: 100vh;
   &.no-scroll {
     overflow: hidden;
+  }
+
+  .spinner-backdrop {
+    position: fixed;
+    width: 100%;
+    color: green;
+    top: 0;
+    bottom: 0;
+    background: #8080804f;
+    z-index: 124;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 5px solid $goud-green;
+      border-top: 5px solid #fff;
+      animation: spin 1s ease infinite;
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    }
   }
 }
 header {
@@ -938,7 +1023,7 @@ main {
 
     .btn-shut-drawer {
       background-color: #999;
-      border-color: #999;
+      border-color: #aaa;
       color: whitesmoke;
 
       &:hover {
@@ -965,7 +1050,7 @@ main {
     color: whitesmoke;
 
     li {
-      padding: 2px;
+      padding: 3px 2px;
       cursor: pointer;
       &:hover {
         background-color: #006200;
@@ -1200,10 +1285,10 @@ main {
     .ingredients {
       max-width: 500px;
       margin: 10px auto;
-      // text-transform: capitalize;
       background-color: rgba(33, 150, 83, 0.1);
       border: 1px solid $border-color-base;
       border-radius: 3px;
+      padding: 0.5rem 1rem;
     }
   }
 }
