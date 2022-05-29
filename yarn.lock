@@ -6610,6 +6610,11 @@ opener@^1.5.2:
   resolved "https://registry.npmmirror.com/opener/-/opener-1.5.2.tgz#5d37e1f35077b9dcac4301372271afdeb2a13598"
   integrity sha512-ur5UIdyw5Y7yEj9wLzhqXiy6GZ3Mwx0yGI+5sMn2r0N0v3cKJvUmFH5yPP+WXh9e0xfyzyJX95D8l088DNFj7A==
 
+openfoodfac-ts@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/openfoodfac-ts/-/openfoodfac-ts-0.3.1.tgz#4183fdcedab6ac7ef9fb209ac5d470d0c41177e2"
+  integrity sha512-33ltb990PH+X6dwAy0GzZCzrECqw/DEUqWLGh6iAiCxY6ZhHimsu1fTNIQ0iCXiU8oR9US7iR9Ay/4THNyenMw==
+
 optionator@^0.8.1:
   version "0.8.3"
   resolved "https://registry.npmmirror.com/optionator/-/optionator-0.8.3.tgz#84fa1d036fe9d3c7e21d99884b601167ec8fb495"
