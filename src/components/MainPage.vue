@@ -808,7 +808,7 @@ $focus-color: rgb(108, 202, 233);
     top: 0;
     bottom: 0;
     background: #8080804f;
-    z-index: 124;
+    z-index: 12;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -871,6 +871,7 @@ main {
 .control-panel {
   padding: 5px;
   position: sticky;
+  z-index: 123;
   top: 0;
   background-color: $goud-beige;
   box-shadow: 0px 2px 3px #5959593b;
@@ -1039,7 +1040,7 @@ main {
   outline: 1px solid $border-color-base;
   border-radius: 4px;
   position: absolute;
-  z-index: 12345;
+  z-index: 1234;
   left: 0;
   top: 170px;
   bottom: 0;
@@ -1048,7 +1049,6 @@ main {
   max-height: 760px;
   max-width: 100%;
   width: 28rem;
-  z-index: 123456;
   transform: translateX(-100%);
   opacity: 0;
   transition: all 500ms;
@@ -1114,6 +1114,13 @@ main {
   grid-row-gap: 30px;
   margin: auto;
   max-width: Min(1300px, 100%);
+
+  @media screen and (max-width: 500px) {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-column-gap: unset;
+    grid-row-gap: unset;
+    padding: unset;
+  }
 }
 
 .product-card {
@@ -1125,9 +1132,21 @@ main {
   display: grid;
   grid-template: 2fr 3fr / 1fr;
   max-width: 200px;
+
+  @media screen and (max-width: 500px) {
+    grid-template: unset;
+    grid-template-columns: 1fr 3fr;
+    max-width: unset;
+    width: 100%;
+    padding: 0.5rem;
+    padding-top: 1rem;
+  }
+
   cursor: pointer;
   &:hover {
     box-shadow: rgba(119, 119, 119, 0.5) 0px 0px 0.357143rem 0px;
+    position: relative;
+    z-index: 1;
   }
   .upper {
     align-self: center;
@@ -1143,6 +1162,20 @@ main {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+
+    @media screen and (max-width: 500px) {
+      justify-self: flex-start;
+      border-top: unset;
+      width: 100%;
+      align-items: flex-start;
+      padding-left: 10px;
+
+      .scores {
+        display: flex;
+        align-items: flex-end;
+        gap: 5px;
+      }
+    }
   }
 }
 
@@ -1183,6 +1216,7 @@ main {
   display: flex;
   justify-content: center;
   position: sticky;
+  z-index: 123;
   bottom: 2px;
 
   .page-list {
