@@ -713,10 +713,12 @@ export default defineComponent({
           state.selectedProduct?.ingredients_text ||
           "";
 
-        const matchedIngredients = ingredientsText.match(
-          /\s?_[^_]+_{1}|((?<![\s|(]_)[^_]+(?!_))/g
-        );
-        console.log(matchedIngredients);
+        // const matchedIngredients = ingredientsText.match(
+        //   /\s?_[^_]+_{1}|((?<![\s|(]_)[^_]+(?!_))/g
+        // );
+        // console.log(matchedIngredients);
+        const matchedIngredients =
+          ingredientsText.match(/\s?_[^_]+_{1}|[^_]+/g);
         return matchedIngredients ?? ["Unknown..."];
       }),
       nova: computed(() => {
