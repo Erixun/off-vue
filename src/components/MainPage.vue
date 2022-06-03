@@ -786,7 +786,7 @@ $form-width: 400px;
 $border-color-base: #c3c3c3;
 $goud-green: rgb(2, 127, 2);
 $goud-beige: var(--goud-beige);
-
+$focus-color: rgb(108, 202, 233);
 .container {
   position: relative;
   display: grid;
@@ -881,6 +881,7 @@ main {
   border-radius: 20px;
   padding: 0 3px 0 8px;
   background-color: white;
+  box-sizing: content-box;
 
   @media screen and (min-width: 650px) {
     margin-top: -40px;
@@ -888,6 +889,10 @@ main {
 
   &:focus-within {
     outline: 2px solid lightblue;
+    @media screen and (max-width: 650px) {
+      outline: unset;
+      border: 1px solid $focus-color;
+    }
   }
 
   form {
