@@ -793,8 +793,9 @@ $goud-beige: var(--goud-beige);
   grid-template-rows: 150px 1fr;
   box-sizing: border-box;
   height: 100vh;
+  overflow-x: hidden;
   &.no-scroll {
-    overflow: hidden;
+    overflow-y: hidden;
   }
 
   .spinner-backdrop {
