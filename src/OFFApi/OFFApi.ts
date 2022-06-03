@@ -155,6 +155,12 @@ export default class OFFApi {
       ? { "User-Agent": this.userAgent }
       : undefined;
 
+    setTimeout(() => {
+      if (this.abortController) {
+        this.abortController.abort();
+      }
+    }, 10000);
+
     return fetchTyped<T>(
       `${this.baseUrl}${apiPath}.json`,
       { headers },
@@ -167,4 +173,5 @@ const DefaultOptions: OFFOptions = {
   country: "world",
   sortProductsBy: "nutriscore_score",
   pageSize: 50,
+  abortController: new AbortController(),
 };

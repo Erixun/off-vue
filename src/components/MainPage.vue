@@ -620,7 +620,7 @@ export default defineComponent({
       const country_tag = state.selectedCountry?.id ?? "";
       OFF.findProductsByCategory(category.id, page, country_tag)
         .then((response) => {
-          console.log(response);
+          // console.log(response);
           state.products = response.products.filter(
             (p) => p.product_name && p.image_front_thumb_url
           );
@@ -660,7 +660,7 @@ export default defineComponent({
       state.isGettingFood = true;
       await OFF.findProductByBarcode(barCode)
         .then((response) => {
-          console.log(response);
+          // console.log(response);
           state.selectedProduct = response;
           if (response && response.brands) {
             state.selectedProduct!.brands = Array.from(
@@ -669,7 +669,7 @@ export default defineComponent({
           }
         })
         .catch((e) => {
-          console.log(e);
+          console.error(e);
         });
 
       setTimeout(() => {
@@ -880,7 +880,7 @@ main {
 .field-search {
   max-width: $form-width;
   margin: auto;
-  height: 30px;
+  height: 32px;
   border: 1px solid #80808078;
   border-radius: 20px;
   padding: 0 3px 0 8px;
