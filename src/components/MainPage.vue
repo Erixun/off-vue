@@ -883,6 +883,7 @@ main {
   padding: 0 3px 0 8px;
   background-color: white;
   box-sizing: content-box;
+  font-size: 16px;
 
   @media screen and (min-width: 650px) {
     margin-top: -40px;
