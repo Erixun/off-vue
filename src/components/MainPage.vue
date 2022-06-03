@@ -1,12 +1,58 @@
 <template>
-  <div class="container" :class="{ 'no-scroll': state.selectedProduct }">
+  <div
+    class="container"
+    :class="{
+      'no-scroll': state.selectedProduct || hasExpandedCategories,
+    }"
+  >
     <header>
       <h1>Goud</h1>
       <h2><i>rated foods for common good</i></h2>
       <div class="header-bg"></div>
     </header>
+
     <div class="spinner-backdrop" v-if="state.isGettingFood">
       <div class="spinner"></div>
+    </div>
+
+    <div
+      @click.stop
+      class="menu-categories"
+      :class="{ expand: state.canShowCategories && !$props.hasCollapsed }"
+    >
+      <div class="menu-head">
+        <button
+          class="btn-shut-drawer btn-goud lefty"
+          @click="hideCategories()"
+        >
+          |&lt;-
+        </button>
+        <div class="field-search">
+          <form @submit.prevent>
+            <label for="search-input">Search category:</label>
+            <input
+              type="search"
+              id="search-input"
+              ref="categorySearch"
+              v-model="state.searchCategoryTerm"
+              placeholder="E.g. Dairy"
+              @input="filterCategories()"
+            />
+          </form>
+        </div>
+      </div>
+      <ul class="list-categories">
+        <li
+          v-for="category in state.categories"
+          :key="category"
+          tabindex="0"
+          @click="getProductsByCategory(category)"
+          @keyup.enter="getProductsByCategory(category)"
+          @keyup.space="getProductsByCategory(category)"
+        >
+          {{ category.name }}
+        </li>
+      </ul>
     </div>
     <main>
       <div class="control-panel">
@@ -74,143 +120,109 @@
             </select>
           </form>
         </div>
-
-        <div
-          @click.stop
-          class="menu-categories"
-          :class="{ expand: state.canShowCategories && !$props.hasCollapsed }"
-        >
-          <div class="menu-head">
-            <button
-              class="btn-shut-drawer btn-goud lefty"
-              @click="hideCategories()"
-            >
-              |&lt;-
-            </button>
-            <div class="field-search">
-              <form @submit.prevent>
-                <label for="search-input">Search category:</label>
-                <input
-                  type="search"
-                  id="search-input"
-                  ref="categorySearch"
-                  v-model="state.searchCategoryTerm"
-                  placeholder="E.g. Dairy"
-                  @input="filterCategories()"
-                />
-              </form>
-            </div>
-          </div>
-          <ul class="list-categories">
-            <li
-              v-for="category in state.categories"
-              :key="category"
-              tabindex="0"
-              @click="getProductsByCategory(category)"
-              @keyup.enter="getProductsByCategory(category)"
-              @keyup.space="getProductsByCategory(category)"
-            >
-              {{ category.name }}
-            </li>
-          </ul>
-        </div>
       </div>
-      <ul class="product-grid">
-        <li
-          class="product-card"
-          v-for="product of state.products"
-          :key="product.id"
-          @click="getProduct(product.code)"
-          @keyup.enter="getProduct(product.code)"
-          @keydown.space.prevent
-          @keyup.space="getProduct(product.code)"
-          tabindex="0"
-          :title="product.product_name"
-        >
-          <div class="upper">
-            <img
-              :src="
-                product.image_front_thumb_url || '/img/tallriksmodellen.webp'
-              "
-              :alt="product.generic_name"
-              loading="lazy"
-            />
-          </div>
-          <div class="lower">
-            <div class="lower-head">
-              <h3 class="product-name">
-                {{ product.product_name.substr(0, 25).trim()
-                }}{{ product.product_name.length > 25 ? "..." : "" }}
-              </h3>
-              <small>{{ product.brands || "Brand Unspecified" }}</small>
-            </div>
-            <div class="scores">
-              <img
-                class="nutriscore-img img-small"
-                :src="`https://static.openfoodfacts.org/images/attributes/nutriscore-${
-                  product.nutriscore_grade ?? 'unknown'
-                }.svg`"
-                alt=""
-              />
-              <img
-                class="ecoscore-img img-small"
-                :src="`https://static.openfoodfacts.org/images/attributes/ecoscore-${product.ecoscore_grade}.svg`"
-                alt=""
-              />
-              <img
-                class="novagroup-img img-small"
-                :src="`https://static.openfoodfacts.org/images/attributes/nova-group-${
-                  product.nova_group ?? 'unknown'
-                }.svg`"
-                alt=""
-              />
-            </div>
-          </div>
-        </li>
-      </ul>
-      <p v-if="state.isGatheringFoods" class="load-text">Gathering foods...</p>
-      <p
-        v-else-if="state.products.length === 0 && state.hasExecutedSearch"
-        class="no-result-msg"
-      >
-        Sorry, no foods found...
-      </p>
-      <div class="page-list-wrapper">
-        <ol
-          class="page-list"
-          v-if="state.pages.length > 1 && !state.isGatheringFoods"
-        >
+      <section class="section-products">
+        <ul class="product-grid">
           <li
-            class="page"
-            :class="{
-              current: state.currentPage === +page,
-              ellipsis: page === '...',
-            }"
-            v-for="(page, i) of state.pages"
-            :key="i"
-            @click="getPage(+page)"
+            class="product-card"
+            v-for="product of state.products"
+            :key="product.id"
+            @click="getProduct(product.code)"
+            @keyup.enter="getProduct(product.code)"
+            @keydown.space.prevent
+            @keyup.space="getProduct(product.code)"
+            tabindex="0"
+            :title="product.product_name"
           >
-            {{ page }}
+            <div class="upper">
+              <img
+                :src="
+                  product.image_front_thumb_url || '/img/tallriksmodellen.webp'
+                "
+                :alt="product.generic_name"
+                loading="lazy"
+              />
+            </div>
+            <div class="lower">
+              <div class="lower-head">
+                <h3 class="product-name">
+                  {{ product.product_name.substr(0, 25).trim()
+                  }}{{ product.product_name.length > 25 ? "..." : "" }}
+                </h3>
+                <small>{{ product.brands || "Brand Unspecified" }}</small>
+              </div>
+              <div class="scores">
+                <img
+                  class="nutriscore-img img-small"
+                  :src="`https://static.openfoodfacts.org/images/attributes/nutriscore-${
+                    product.nutriscore_grade ?? 'unknown'
+                  }.svg`"
+                  alt=""
+                />
+                <img
+                  class="ecoscore-img img-small"
+                  :src="`https://static.openfoodfacts.org/images/attributes/ecoscore-${product.ecoscore_grade}.svg`"
+                  alt=""
+                />
+                <img
+                  class="novagroup-img img-small"
+                  :src="`https://static.openfoodfacts.org/images/attributes/nova-group-${
+                    product.nova_group ?? 'unknown'
+                  }.svg`"
+                  alt=""
+                />
+              </div>
+            </div>
           </li>
-        </ol>
-      </div>
-      <figure
-        v-if="
-          !state.hasExecutedSearch && !hasProducts() && !state.isGatheringFoods
-        "
-      >
-        <figcaption>An app based on</figcaption>
-        <a href="https://world.openfoodfacts.org/" target="_blank">
-          <img
-            id="logo"
-            src="../assets/openfoodfacts-logo-en.png"
-            alt="Open Food Facts logo"
-            style="margin-bottom: 0.5rem"
-            width="178"
-            height="150"
-          />
-        </a>
-      </figure>
+        </ul>
+        <p v-if="state.isGatheringFoods" class="load-text">
+          Gathering foods...
+        </p>
+        <p
+          v-else-if="state.products.length === 0 && state.hasExecutedSearch"
+          class="no-result-msg"
+        >
+          Sorry, no foods found...
+        </p>
+        <div class="page-list-wrapper">
+          <ol
+            class="page-list"
+            v-if="state.pages.length > 1 && !state.isGatheringFoods"
+          >
+            <li
+              class="page"
+              :class="{
+                current: state.currentPage === +page,
+                ellipsis: page === '...',
+              }"
+              v-for="(page, i) of state.pages"
+              :key="i"
+              @click="getPage(+page)"
+            >
+              {{ page }}
+            </li>
+          </ol>
+        </div>
+        <figure
+          v-if="
+            !state.hasExecutedSearch &&
+            !hasProducts() &&
+            !state.isGatheringFoods
+          "
+        >
+          <figcaption>An app based on</figcaption>
+          <a href="https://world.openfoodfacts.org/" target="_blank">
+            <img
+              id="logo"
+              src="../assets/openfoodfacts-logo-en.png"
+              alt="Open Food Facts logo"
+              style="margin-bottom: 0.5rem"
+              width="178"
+              height="150"
+            />
+          </a>
+        </figure>
+      </section>
     </main>
     <div
       class="product-view"
@@ -389,7 +401,12 @@
         </div>
       </div>
     </div>
-    <p class="note">
+    <p
+      class="note"
+      v-if="
+        !state.hasExecutedSearch && !hasProducts() && !state.isGatheringFoods
+      "
+    >
       <b>Note:</b> some of the products are incomplete, and their associated
       data may be incorrect. <br />You are more than welcome to improve existing
       products, or add your own, via
@@ -425,7 +442,7 @@ export default defineComponent({
     },
   },
   emits: ["open-up"],
-  setup(_props, context) {
+  setup(props, context) {
     const state = reactive<{
       countries: Array<Tag>;
       selectedCountry: null | Tag;
@@ -713,10 +730,6 @@ export default defineComponent({
           state.selectedProduct?.ingredients_text ||
           "";
 
-        // const matchedIngredients = ingredientsText.match(
-        //   /\s?_[^_]+_{1}|((?<![\s|(]_)[^_]+(?!_))/g
-        // );
-        // console.log(matchedIngredients);
         const matchedIngredients =
           ingredientsText.match(/\s?_[^_]+_{1}|[^_]+/g);
         return matchedIngredients ?? ["Unknown..."];
@@ -746,6 +759,9 @@ export default defineComponent({
           "unknown"
         );
       }),
+      hasExpandedCategories: computed(
+        () => state.canShowCategories && !props.hasCollapsed
+      ),
       describeEcoScore,
       getPage,
       logInput,
@@ -812,7 +828,7 @@ $goud-beige: var(--goud-beige);
   }
 }
 header {
-  color: var(--goud-beige);
+  color: $goud-beige;
   position: relative;
   h1 {
     font-size: 2.5rem;
@@ -841,9 +857,19 @@ main {
   position: relative;
   margin-top: 2rem;
   max-width: 100vw;
+  display: flex;
+  flex-direction: column;
+
+  @media screen and (max-width: 600px) {
+    margin-top: 1rem;
+  }
 }
 .control-panel {
   padding: 5px;
+  position: sticky;
+  top: 0;
+  background-color: $goud-beige;
+  box-shadow: 0px 2px 3px #5959593b;
 }
 
 .field-search {
@@ -854,6 +880,10 @@ main {
   border-radius: 20px;
   padding: 0 3px 0 8px;
   background-color: white;
+
+  @media screen and (min-width: 650px) {
+    margin-top: -40px;
+  }
 
   &:focus-within {
     outline: 2px solid lightblue;
@@ -934,6 +964,10 @@ main {
   align-items: center;
   gap: 6px;
 
+  @media screen and (min-width: 650px) {
+    margin-top: -40px;
+  }
+
   .x {
     background-color: #888;
     border-color: #888;
@@ -997,14 +1031,14 @@ main {
   position: absolute;
   z-index: 12345;
   left: 0;
-  top: 0;
+  top: 170px;
+  bottom: 0;
   overflow: auto;
   background-color: $goud-green;
-  height: 100%;
-  max-height: 100%;
+  max-height: 760px;
   max-width: 100%;
-  width: 400px;
-
+  width: 28rem;
+  z-index: 123456;
   transform: translateX(-100%);
   opacity: 0;
   transition: all 500ms;
