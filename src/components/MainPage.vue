@@ -29,11 +29,12 @@
         </button>
         <div class="field-search">
           <form @submit.prevent>
-            <label for="search-input">Search category:</label>
+            <label for="search-input">Search:</label>
             <input
               type="search"
               id="search-input"
               ref="categorySearch"
+              aria-label="Search for a category"
               v-model="state.searchCategoryTerm"
               placeholder="E.g. Dairy"
               @input="filterCategories()"
@@ -73,10 +74,11 @@
         </div>
         <div class="field-search" v-if="state.selectedCategory === null">
           <form @submit.prevent>
-            <label for="search-input">Search food:</label>
+            <label for="search-input">Search:</label>
             <input
               type="search"
               id="search-input"
+              aria-label="Search food products"
               v-model="state.searchTerm"
               placeholder="E.g. Potato"
               @keyup.enter="execSearch()"
@@ -901,7 +903,7 @@ main {
     height: 100%;
     width: 100%;
     display: grid;
-    grid-template-columns: 2fr 6fr 60px;
+    grid-template-columns: 1fr 6fr 60px;
     grid-template-areas: "search-label search-field action";
     align-items: center;
 
