@@ -158,6 +158,7 @@ export default class OFFApi {
     setTimeout(() => {
       if (this.abortController) {
         this.abortController.abort();
+        this.abortController = new AbortController();
       }
     }, 10000);
 

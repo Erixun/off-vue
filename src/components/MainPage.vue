@@ -266,7 +266,7 @@
                 <td class="n-label">Energy</td>
                 <td>
                   {{
-                    state.selectedProduct.nutriments.energy.toFixed(0) || "?"
+                    state.selectedProduct.nutriments.energy?.toFixed(0) || "?"
                   }}
                   kJ ({{
                     state.selectedProduct.nutriments["energy-kcal"]?.toFixed(
@@ -284,7 +284,7 @@
               >
                 <td class="n-label">Fat</td>
                 <td>
-                  {{ +state.selectedProduct.nutriments.fat.toFixed(1) ?? "?" }}
+                  {{ +state.selectedProduct.nutriments.fat?.toFixed(1) ?? "?" }}
                   g
                 </td>
               </tr>
@@ -297,7 +297,7 @@
                 <td class="n-label indented">Saturated fat</td>
                 <td>
                   {{
-                    +state.selectedProduct.nutriments["saturated-fat"].toFixed(
+                    +state.selectedProduct.nutriments["saturated-fat"]?.toFixed(
                       1
                     ) ?? "?"
                   }}
@@ -308,7 +308,7 @@
                 <td class="n-label">Carbohydrates</td>
                 <td>
                   {{
-                    +state.selectedProduct.nutriments.carbohydrates.toFixed(
+                    +state.selectedProduct.nutriments.carbohydrates?.toFixed(
                       1
                     ) ?? "?"
                   }}
@@ -324,7 +324,7 @@
                 <td class="n-label indented">Sugars</td>
                 <td>
                   {{
-                    +state.selectedProduct.nutriments.sugars.toFixed(1) ?? "?"
+                    +state.selectedProduct.nutriments.sugars?.toFixed(1) ?? "?"
                   }}
                   g
                 </td>
@@ -333,7 +333,8 @@
                 <td class="n-label">Proteins</td>
                 <td>
                   {{
-                    +state.selectedProduct.nutriments.proteins.toFixed(1) ?? "?"
+                    +state.selectedProduct.nutriments.proteins?.toFixed(1) ??
+                    "?"
                   }}
                   g
                 </td>
@@ -346,7 +347,9 @@
               >
                 <td class="n-label">Salt</td>
                 <td>
-                  {{ +state.selectedProduct.nutriments.salt.toFixed(2) ?? "?" }}
+                  {{
+                    +state.selectedProduct.nutriments.salt?.toFixed(2) || "?"
+                  }}
                   g
                 </td>
               </tr>
@@ -762,7 +765,10 @@ export default defineComponent({
         );
       }),
       hasExpandedCategories: computed(
-        () => state.canShowCategories && !props.hasCollapsed
+        () =>
+          state.canShowCategories &&
+          !props.hasCollapsed &&
+          !state.hasProductInView
       ),
       describeEcoScore,
       getPage,
