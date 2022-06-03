@@ -793,6 +793,7 @@ $focus-color: rgb(108, 202, 233);
   grid-template-rows: 150px 1fr;
   box-sizing: border-box;
   height: 100vh;
+  height: -webkit-fill-available;
   overflow-x: hidden;
   &.no-scroll {
     overflow-y: hidden;
