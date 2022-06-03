@@ -10,6 +10,21 @@
     </div>
     <main>
       <div class="control-panel">
+        <div class="drawer-btns">
+          <button
+            class="btn-categories btn-goud righty"
+            @click.stop="displayCategories()"
+          >
+            |-> Categories
+          </button>
+          <button
+            class="btn-categories btn-goud lefty"
+            disabled
+            @click.stop="displayCategories()"
+          >
+            Options &lt;-|
+          </button>
+        </div>
         <div class="field-search" v-if="state.selectedCategory === null">
           <form @submit.prevent>
             <label for="search-input">Search food:</label>
@@ -58,21 +73,6 @@
               </option>
             </select>
           </form>
-        </div>
-        <div class="drawer-btns">
-          <button
-            class="btn-categories btn-goud righty"
-            @click.stop="displayCategories()"
-          >
-            |-> Categories
-          </button>
-          <button
-            class="btn-categories btn-goud lefty"
-            disabled
-            @click.stop="displayCategories()"
-          >
-            Options &lt;-|
-          </button>
         </div>
 
         <div
@@ -919,7 +919,7 @@ main {
   max-width: min(1300px, 100%);
   margin: auto;
   height: 30px;
-  padding: 10px 0 5px;
+  padding: 0px 0 10px;
 }
 
 .category-header {
