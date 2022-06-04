@@ -35,7 +35,7 @@ export default defineComponent({
 :root {
   --goud-beige: #f8f9fa;
   background-color: var(--goud-beige);
-  font-size: clamp(14px, 1vw, 16px);
+  font-size: 16px; //clamp(14px, 1vw, 16px);
   overflow-x: hidden;
 }
 body {

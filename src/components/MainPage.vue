@@ -854,6 +854,7 @@ $border-color-base: #c3c3c3;
 $goud-green: rgb(2, 127, 2);
 $goud-beige: var(--goud-beige);
 $focus-color: rgb(108, 202, 233);
+$btn-x-color: #222;
 .container {
   position: relative;
   display: grid;
@@ -884,7 +885,7 @@ $focus-color: rgb(108, 202, 233);
       border-radius: 50%;
       border: 5px solid $goud-green;
       border-top: 5px solid #fff;
-      animation: spin 1s ease-in-out infinite;
+      animation: spin 700ms ease-in-out infinite;
       @keyframes spin {
         0% {
           transform: rotate(0deg);
@@ -986,6 +987,7 @@ main {
       border: none;
       font-size: inherit;
       grid-area: search-field;
+      background-color: transparent;
       &:focus {
         outline: none;
       }
@@ -996,16 +998,17 @@ main {
       justify-self: end;
       display: flex;
       align-items: center;
-      gap: 2px;
+      gap: 5px;
       .x {
-        background-color: #888;
-        border-color: #888;
-        height: 25px;
-        width: 25px;
+        background-color: $btn-x-color; //#888;
+        border-color: $btn-x-color; //#888;
+        height: 28px;
+        width: 30px;
         line-height: 1rem;
+        font-size: 1.4rem;
         &:hover {
-          background-color: #666;
-          border-color: #666;
+          background-color: #444;
+          border-color: #444;
         }
       }
     }
@@ -1048,17 +1051,18 @@ main {
   }
 
   .x {
-    background-color: #888;
-    border-color: #888;
+    background-color: $btn-x-color; //#888;
+    border-color: $btn-x-color; //#888;
     line-height: 0.5;
     padding-bottom: 4px;
     font-weight: bold;
-    font-size: 0.6rem;
-    width: 1.4rem;
-    height: 1.4rem;
+    font-size: 0.7rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    color: white;
     &:hover {
-      background-color: #666;
-      border-color: #666;
+      background-color: #444;
+      border-color: #444;
     }
   }
 }
@@ -1137,13 +1141,13 @@ main {
     padding: 9px 8px 0;
 
     .btn-shut-drawer {
-      background-color: #999;
-      border-color: #aaa;
+      background-color: $btn-x-color; //#888;-x-color
+      border-color: $btn-x-color;
       color: whitesmoke;
 
       &:hover {
-        background-color: #888;
-        border-color: #888;
+        background-color: #333;
+        border-color: #333;
       }
     }
 
@@ -1156,6 +1160,9 @@ main {
       flex-grow: 1;
       form {
         grid-template-columns: 1fr;
+        input {
+          background-color: transparent;
+        }
       }
     }
   }
@@ -1165,7 +1172,7 @@ main {
     color: whitesmoke;
 
     li {
-      padding: 3px 2px;
+      padding: 5px 2px;
       cursor: pointer;
       &:hover {
         background-color: #006200;
@@ -1382,14 +1389,15 @@ main {
       font-size: inherit;
       border: none;
       border-radius: 50%;
-      border: 1px solid #848484;
+      border: 1px solid;
       color: #626262;
       color: white;
-      background-color: #888;
-      border-color: #888;
+      background-color: $btn-x-color;
+      border-color: $btn-x-color;
       &:hover {
-        background-color: #666;
-        border-color: #666;
+        background-color: #444;
+        border-color: #444;
+        // filter: brightness(0.9);
       }
     }
 
