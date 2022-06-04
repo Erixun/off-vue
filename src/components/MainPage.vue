@@ -679,6 +679,7 @@ export default defineComponent({
         state.isGettingFood = false;
         state.hasProductInView = true;
         productView.value?.focus();
+        productView.value?.scrollIntoView();
       }, 0);
     };
 
