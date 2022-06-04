@@ -1032,7 +1032,7 @@ main {
   justify-content: space-between;
   max-width: min(1300px, 100%);
   margin: 5px auto;
-  height: 30px;
+  height: 2rem;
   // padding: 0px 0 10px;
 }
 
@@ -1071,7 +1071,7 @@ main {
   background-color: rgb(2, 127, 2);
   border: 2px solid rgb(2, 127, 2);
   border-radius: 14px;
-  padding: 2px;
+  // padding: 2px;
   color: whitesmoke;
   font-size: 1rem;
   cursor: pointer;
@@ -1083,11 +1083,11 @@ main {
 
   &.righty {
     border-radius: 3px 14px 14px 3px;
-    padding: 0 7px 2px;
+    padding: 0 8px 2px;
   }
   &.lefty {
     border-radius: 14px 3px 3px 14px;
-    padding: 0 7px 2px;
+    padding: 0 8px 2px;
   }
 }
 
@@ -1383,11 +1383,13 @@ main {
       cursor: pointer;
       top: 10px;
       right: 15px;
-      // width: 40px;
-      // height: 40px;
-      padding: 11px 14px;
+      width: 40px;
+      height: 40px;
+      line-height: 1rem;
+      // font-size: 1.4rem;
+      // padding: 11px 14px;
       font-weight: bold;
-      font-size: inherit;
+      // font-size: inherit;
       border: none;
       border-radius: 50%;
       border: 1px solid;
