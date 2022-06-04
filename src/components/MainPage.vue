@@ -105,7 +105,10 @@
         </div>
         <h3 v-else class="category-header">
           Category - {{ state.selectedCategory.name }}
-          <button class="btn-goud abs x" @click="resetToDefault()">╳</button>
+          <button class="btn-goud abs x" @click="resetToDefault()">
+            &times;
+          </button>
+          <!-- ╳ -->
         </h3>
         <div class="field-country">
           <form @submit.prevent>
@@ -998,12 +1001,14 @@ main {
       justify-self: end;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 5px;
       .x {
         background-color: $btn-x-color; //#888;
         border-color: $btn-x-color; //#888;
         height: 28px;
         width: 30px;
+        padding: 0;
         line-height: 1rem;
         font-size: 1.4rem;
         &:hover {
@@ -1053,10 +1058,10 @@ main {
   .x {
     background-color: $btn-x-color; //#888;
     border-color: $btn-x-color; //#888;
-    line-height: 0.5;
-    padding-bottom: 2px;
-    font-weight: bold;
-    font-size: 0.7rem;
+    // line-height: 0.5;
+    padding: 0;
+    // font-weight: bold;
+    font-size: 1rem;
     width: 1.5rem;
     height: 1.5rem;
     color: white;
