@@ -1054,7 +1054,7 @@ main {
     background-color: $btn-x-color; //#888;
     border-color: $btn-x-color; //#888;
     line-height: 0.5;
-    padding-bottom: 4px;
+    padding-bottom: 2px;
     font-weight: bold;
     font-size: 0.7rem;
     width: 1.5rem;
@@ -1383,8 +1383,9 @@ main {
       cursor: pointer;
       top: 10px;
       right: 15px;
-      width: 40px;
-      height: 40px;
+      // width: 40px;
+      // height: 40px;
+      padding: 11px 14px;
       font-weight: bold;
       font-size: inherit;
       border: none;
