@@ -146,7 +146,7 @@
                 :src="
                   product.image_front_thumb_url || '/img/tallriksmodellen.webp'
                 "
-                :alt="product.generic_name"
+                alt="Front of product"
                 loading="lazy"
               />
             </div>
@@ -168,19 +168,19 @@
                   :src="`https://static.openfoodfacts.org/images/attributes/nutriscore-${
                     product.nutriscore_grade ?? 'unknown'
                   }.svg`"
-                  alt=""
+                  alt="Nutriscore grade"
                 />
                 <img
                   class="ecoscore-img img-small"
                   :src="`https://static.openfoodfacts.org/images/attributes/ecoscore-${product.ecoscore_grade}.svg`"
-                  alt=""
+                  alt="Ecocore grade"
                 />
                 <img
                   class="novagroup-img img-small"
                   :src="`https://static.openfoodfacts.org/images/attributes/nova-group-${
                     product.nova_group ?? 'unknown'
                   }.svg`"
-                  alt=""
+                  alt="Nova Group"
                 />
               </div>
             </div>
@@ -1299,8 +1299,8 @@ main {
     justify-content: center;
     gap: 0.6rem;
     max-width: 100vw;
-    padding: 5px;
-    outline: 1px solid $border-color-base;
+    padding: 4px;
+    border: 1px solid $border-color-base;
     border-radius: 7px 7px 0 0;
     background-color: white;
     margin: 5px 0 0;
