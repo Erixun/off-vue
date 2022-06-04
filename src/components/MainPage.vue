@@ -621,6 +621,7 @@ export default defineComponent({
       const menuCategoriesElement = menuCategories.value;
       if (menuCategoriesElement) {
         const rect = menuCategoriesElement.getBoundingClientRect();
+        console.log(rect);
         if (rect.top < 0) {
           menuCategoriesElement.scrollIntoView(true);
           menuCategoriesElement.style.maxHeight = "100vh";
@@ -818,8 +819,8 @@ $focus-color: rgb(108, 202, 233);
   display: grid;
   grid-template-rows: 8rem 1fr;
   box-sizing: border-box;
-  height: 100vh;
   height: -webkit-fill-available;
+  height: 100vh;
   overflow-x: hidden;
   &.no-scroll {
     overflow-y: hidden;
