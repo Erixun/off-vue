@@ -84,6 +84,7 @@
               aria-label="Search food products"
               v-model="state.searchTerm"
               placeholder="Search food, e.g. Potato"
+              @keydown.enter.prevent
               @keyup.enter="execSearch()"
               @focusout="execSearch()"
             />
@@ -155,7 +156,11 @@
                   {{ product.product_name.substr(0, 25).trim()
                   }}{{ product.product_name.length > 25 ? "..." : "" }}
                 </h3>
-                <small>{{ product.brands || "Brand Unspecified" }}</small>
+                <small
+                  >{{
+                    product.brands?.substr(0, 30).trim() || "Brand Unspecified"
+                  }}{{ product.brands?.length > 30 ? "..." : "" }}</small
+                >
               </div>
               <div class="scores">
                 <img
@@ -181,20 +186,29 @@
             </div>
           </li>
         </ul>
-        <p v-if="state.isGatheringFoods" class="load-text">
+        <!-- <p v-if="state.isGatheringFoods" class="load-text">
           Gathering foods...
-        </p>
+        </p> -->
         <p
-          v-else-if="state.products.length === 0 && state.hasExecutedSearch"
+          v-if="
+            !state.isGettingFood &&
+            state.products.length === 0 &&
+            state.hasExecutedSearch
+          "
           class="no-result-msg"
         >
           Sorry, no foods found...
         </p>
         <div class="page-list-wrapper">
-          <ol
-            class="page-list"
-            v-if="state.pages.length > 1 && !state.isGatheringFoods"
-          >
+          <!-- && !state.isGatheringFoods" -->
+          <ol class="page-list" v-if="state.pages.length > 1">
+            <li
+              v-if="state.currentPage != 1"
+              class="page prev"
+              @click="getPage(state.currentPage - 1)"
+            >
+              &lt;
+            </li>
             <li
               class="page"
               :class="{
@@ -206,6 +220,13 @@
               @click="getPage(+page)"
             >
               {{ page }}
+            </li>
+            <li
+              v-if="state.currentPage != state.allPages.length"
+              @click="getPage(state.currentPage + 1)"
+              class="page next"
+            >
+              &gt;
             </li>
           </ol>
         </div>
@@ -460,6 +481,7 @@ export default defineComponent({
       categories: Array<Tag>;
       selectedCategory: null | Tag;
       searchTerm: null;
+      previousSearchTerm: string;
       searchCategoryTerm: null | string;
       products: Array<Product>;
       isGatheringFoods: boolean;
@@ -478,6 +500,7 @@ export default defineComponent({
       categories: Array<Tag>(),
       selectedCategory: null,
       searchTerm: null,
+      previousSearchTerm: "",
       searchCategoryTerm: null,
       products: Array<Product>(),
       isGatheringFoods: false,
@@ -509,12 +532,15 @@ export default defineComponent({
 
     const initLoading = () => {
       state.hasExecutedSearch = true;
-      state.products = [];
-      state.isGatheringFoods = true;
+      // state.products = [];
+      // state.isGatheringFoods = true;
+      state.isGettingFood = true;
     };
 
     const execSearch = async (page = 1) => {
-      if (!state.searchTerm) return;
+      if (!state.searchTerm || state.searchTerm === state.previousSearchTerm)
+        return;
+      state.previousSearchTerm = state.searchTerm;
       initLoading();
 
       const countryId = state.selectedCountry ? state.selectedCountry.id : "";
@@ -528,7 +554,8 @@ export default defineComponent({
       });
 
       if (response.products.length === 0) {
-        state.isGatheringFoods = false;
+        // state.isGatheringFoods = false;
+        state.isGettingFood = false;
         return;
       }
 
@@ -543,23 +570,25 @@ export default defineComponent({
 
       handlePages(response);
 
-      state.isGatheringFoods = false;
+      // state.isGatheringFoods = false;
+      state.isGettingFood = false;
       state.lastRequest = "search";
     };
 
     const handlePages = (response: ProductsResponse) => {
       const emptyPages = Array(Math.floor(response.count / response.page_size));
-      const everyPage = Array.from(emptyPages, (p, i) => `${i + 1}`);
+      const everyPage = [...emptyPages].map((_, i) => `${i + 1}`);
       state.allPages = everyPage;
 
-      if (everyPage.length < 7) {
+      if (everyPage.length < 6) {
         state.pages = everyPage;
       } else {
-        const firstThree = everyPage.slice(0, 3);
-        const end = everyPage.length;
-        const lastThree = everyPage.slice(end - 3, end);
+        // const firstThree = everyPage.slice(0, 3);
+        // const end = everyPage.length;
+        // const lastThree = everyPage.slice(end - 3, end);
 
-        const pages = [...firstThree, "...", ...lastThree];
+        // const pages = [...firstThree, "...", ...lastThree];
+        const pages = everyPage.slice(0, 5);
         state.pages = pages;
       }
     };
@@ -573,34 +602,42 @@ export default defineComponent({
 
       state.currentPage = page;
 
-      if (state.allPages.length < 7) return;
-
-      const surroundingPages = [
-        page - 2,
-        page - 1,
-        page,
-        page + 1,
-        page + 2,
-      ].filter((p) => 0 < p && p < state.allPages.length);
-
-      if (5 < surroundingPages[0]) {
-        surroundingPages.unshift(NaN);
-      }
-      if (surroundingPages[4] < +state.allPages[state.allPages.length - 4]) {
-        surroundingPages.push(NaN);
+      if (state.allPages.length < 6) return;
+      if (
+        page < +state.pages[0] ||
+        page > +state.pages[state.pages.length - 1]
+      ) {
+        state.pages = state.allPages.slice(page - 3, page + 2);
       }
 
-      const first = [1, 2, 3].filter((p) => !surroundingPages.includes(p));
-      const last = getLastThree().filter((p) => !surroundingPages.includes(+p));
-      const pagesNums = [...first, ...surroundingPages, ...last];
-      state.pages = pagesNums.map((p) => String(+p || "..."));
+      // const surroundingPages = [
+      //   page - 2,
+      //   page - 1,
+      //   page,
+      //   page + 1,
+      //   page + 2,
+      // ].filter((p) => 0 < p && p < state.allPages.length);
+
+      // state.pages = surroundingPages.map((p) => `${p}`);
+
+      // if (5 < surroundingPages[0]) {
+      //   surroundingPages.unshift(NaN);
+      // }
+      // if (surroundingPages[4] < +state.allPages[state.allPages.length - 4]) {
+      //   surroundingPages.push(NaN);
+      // }
+
+      // const first = [1, 2, 3].filter((p) => !surroundingPages.includes(p));
+      // const last = getLastThree().filter((p) => !surroundingPages.includes(+p));
+      // const pagesNums = [...first, ...surroundingPages, ...last];
+      // state.pages = pagesNums.map((p) => String(+p || "..."));
     };
 
-    const getLastThree = () => {
-      const end = state.allPages.length;
-      const lastThree = state.allPages.slice(end - 3, end);
-      return lastThree;
-    };
+    // const getLastThree = () => {
+    //   const end = state.allPages.length;
+    //   const lastThree = state.allPages.slice(end - 3, end);
+    //   return lastThree;
+    // };
 
     const filterCategories = () => {
       if (!state.searchCategoryTerm) return;
@@ -624,7 +661,7 @@ export default defineComponent({
       if (menuCategoriesElement) {
         const rect = menuCategoriesElement.getBoundingClientRect();
         console.log(rect);
-        if (rect.top < 0) {
+        if (rect.top < 1) {
           menuCategoriesElement.scrollIntoView(true);
           menuCategoriesElement.style.maxHeight = "100vh";
         } else {
@@ -657,7 +694,8 @@ export default defineComponent({
           console.error(e);
         })
         .finally(() => {
-          state.isGatheringFoods = false;
+          // state.isGatheringFoods = false;
+          state.isGettingFood = false;
           state.currentPage = page;
           state.lastRequest = "category";
         });
@@ -835,7 +873,7 @@ $focus-color: rgb(108, 202, 233);
     top: 0;
     bottom: 0;
     background: #8080804f;
-    z-index: 12;
+    z-index: 12345;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -846,7 +884,7 @@ $focus-color: rgb(108, 202, 233);
       border-radius: 50%;
       border: 5px solid $goud-green;
       border-top: 5px solid #fff;
-      animation: spin 1s ease infinite;
+      animation: spin 1s ease-in-out infinite;
       @keyframes spin {
         0% {
           transform: rotate(0deg);
@@ -1250,9 +1288,10 @@ main {
 .page-list-wrapper {
   display: flex;
   justify-content: center;
-  // position: sticky;
   z-index: 123;
-  // bottom: 2px;
+  // position: relative;
+  position: sticky;
+  bottom: 0;
 
   .page-list {
     list-style: none;
@@ -1261,16 +1300,24 @@ main {
     gap: 0.6rem;
     max-width: 100vw;
     padding: 5px;
-    // outline: 1px solid $border-color-base;
-    border-radius: 7px;
-    // background-color: white;
-    margin: 5px 0;
+    outline: 1px solid $border-color-base;
+    border-radius: 7px 7px 0 0;
+    background-color: white;
+    margin: 5px 0 0;
     .page {
       padding: 5px 8px;
       background-color: lightgray;
       border: 2px solid lightgray;
       border-radius: 5px;
       cursor: pointer;
+
+      &.prev,
+      &.next {
+        color: white;
+        background-color: $goud-green;
+        border-color: $goud-green;
+        font-weight: bold;
+      }
 
       &:hover {
         filter: brightness(0.97);
@@ -1280,7 +1327,7 @@ main {
         background-color: transparent;
         font-weight: bold;
         pointer-events: none;
-        border-color: white;
+        border-color: transparent;
       }
       &.current {
         pointer-events: none;

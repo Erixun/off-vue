@@ -43,10 +43,17 @@ export default class OFFApi {
 
     this.userAgent = mergedOptions.userAgent;
     this.country = mergedOptions.country;
+    this.baseUrl = `https://${this.country}.openfoodfacts.org`;
     this.sortProductsBy = mergedOptions.sortProductsBy;
     this.pageSize = mergedOptions.pageSize;
     this.abortController = mergedOptions.abortController;
-    this.baseUrl = `https://${this.country}.openfoodfacts.org`;
+    if (this.abortController) {
+      const { signal } = this.abortController;
+      signal.onabort = () => {
+        console.log("Abort signal received.");
+        this.abortController = new AbortController();
+      };
+    }
   }
 
   async findProductByBarcode(
