@@ -150,17 +150,17 @@ export default class OFFApi {
     return this;
   }
 
+  abortRequest(): void {
+    if (this.abortController) {
+      this.abortController.abort();
+    }
+    this.abortController = new AbortController();
+  }
+
   private request<T extends object>(apiPath: string): Promise<T> {
     const headers = this.userAgent
       ? { "User-Agent": this.userAgent }
       : undefined;
-
-    setTimeout(() => {
-      if (this.abortController) {
-        this.abortController.abort();
-        this.abortController = new AbortController();
-      }
-    }, 10000);
 
     return fetchTyped<T>(
       `${this.baseUrl}${apiPath}.json`,

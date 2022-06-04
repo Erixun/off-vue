@@ -5,10 +5,16 @@ export const fetchTyped = async <T>(
 ): Promise<T> => {
   const { signal } = controller;
 
+  const timeoutId = setTimeout(() => {
+    controller.abort();
+  }, 10000);
+
   const response = await fetch(input, { signal, ...init });
 
   if (!response.ok) {
     throw new Error(response.statusText);
+  } else {
+    clearTimeout(timeoutId);
   }
 
   const json: T = await response.json();
