@@ -30,14 +30,14 @@
         </button>
         <div class="field-search">
           <form @submit.prevent>
-            <label for="search-category-input">Search:</label>
+            <!-- <label for="search-category-input">Search:</label> -->
             <input
               type="search"
               id="search-category-input"
               ref="categorySearch"
               aria-label="Search for a category"
               v-model="state.searchCategoryTerm"
-              placeholder="E.g. Dairy"
+              placeholder="Search category, e.g. Dairy"
               @input="filterCategories()"
             />
           </form>
@@ -77,13 +77,13 @@
         </div>
         <div class="field-search" v-if="state.selectedCategory === null">
           <form @submit.prevent>
-            <label for="search-input">Search:</label>
+            <!-- <label for="search-input">Search:</label> -->
             <input
               type="search"
               id="search-input"
               aria-label="Search food products"
               v-model="state.searchTerm"
-              placeholder="E.g. Potato"
+              placeholder="Search food, e.g. Potato"
               @keyup.enter="execSearch()"
               @focusout="execSearch()"
             />
@@ -934,15 +934,15 @@ main {
     height: 100%;
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr 6fr 60px;
-    grid-template-areas: "search-label search-field action";
+    grid-template-columns: 1fr 60px;
+    grid-template-areas: "search-field action";
     align-items: center;
 
-    label {
-      margin-bottom: -2px;
-      white-space: nowrap;
-      grid-area: search-label;
-    }
+    // label {
+    //   margin-bottom: -2px;
+    //   white-space: nowrap;
+    //   grid-area: search-label;
+    // }
 
     input {
       border: none;
@@ -1075,6 +1075,8 @@ main {
   top: 9rem;
   overflow: auto;
   background-color: $goud-green;
+  height: 100vh;
+  min-height: calc(100vh - 9rem);
   max-height: calc(100vh - 9rem);
   max-width: 100%;
   width: 28rem;
@@ -1115,7 +1117,7 @@ main {
       max-width: unset;
       flex-grow: 1;
       form {
-        grid-template-columns: auto 1fr;
+        grid-template-columns: 1fr;
       }
     }
   }
@@ -1248,9 +1250,9 @@ main {
 .page-list-wrapper {
   display: flex;
   justify-content: center;
-  position: sticky;
+  // position: sticky;
   z-index: 123;
-  bottom: 2px;
+  // bottom: 2px;
 
   .page-list {
     list-style: none;
@@ -1259,13 +1261,14 @@ main {
     gap: 0.6rem;
     max-width: 100vw;
     padding: 5px;
-    outline: 1px solid $border-color-base;
+    // outline: 1px solid $border-color-base;
     border-radius: 7px;
-    background-color: white;
+    // background-color: white;
     margin: 5px 0;
     .page {
       padding: 5px 8px;
       background-color: lightgray;
+      border: 2px solid lightgray;
       border-radius: 5px;
       cursor: pointer;
 
@@ -1277,10 +1280,11 @@ main {
         background-color: transparent;
         font-weight: bold;
         pointer-events: none;
+        border-color: white;
       }
       &.current {
         pointer-events: none;
-        outline: 2px solid $goud-green;
+        border: 2px solid $goud-green;
         border-radius: 5px;
       }
     }
