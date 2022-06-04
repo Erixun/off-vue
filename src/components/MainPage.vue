@@ -85,6 +85,7 @@
               v-model="state.searchTerm"
               placeholder="E.g. Potato"
               @keyup.enter="execSearch()"
+              @focusout="execSearch()"
             />
             <div class="action">
               <button
@@ -214,6 +215,7 @@
             !hasProducts() &&
             !state.isGatheringFoods
           "
+          class="figure-off"
         >
           <figcaption>An app based on</figcaption>
           <a href="https://world.openfoodfacts.org/" target="_blank">
@@ -819,8 +821,8 @@ $focus-color: rgb(108, 202, 233);
   display: grid;
   grid-template-rows: 8rem 1fr;
   box-sizing: border-box;
-  height: -webkit-fill-available;
   height: 100vh;
+  height: -webkit-fill-available;
   overflow-x: hidden;
   &.no-scroll {
     overflow-y: hidden;
@@ -887,7 +889,7 @@ header {
 }
 main {
   position: relative;
-  margin-top: 2rem;
+  margin-top: 1.5rem;
   max-width: 100vw;
   display: flex;
   flex-direction: column;
@@ -917,7 +919,7 @@ main {
   font-size: 16px;
 
   @media screen and (min-width: 650px) {
-    margin-top: -40px;
+    margin-top: -30px;
   }
 
   &:focus-within {
@@ -988,9 +990,9 @@ main {
   display: flex;
   justify-content: space-between;
   max-width: min(1300px, 100%);
-  margin: auto;
+  margin: 5px auto;
   height: 30px;
-  padding: 0px 0 10px;
+  // padding: 0px 0 10px;
 }
 
 .category-header {
@@ -1038,18 +1040,18 @@ main {
   }
 
   &.righty {
-    border-radius: 2px 14px 14px 2px;
+    border-radius: 3px 14px 14px 3px;
     padding: 0 7px 2px;
   }
   &.lefty {
-    border-radius: 14px 2px 2px 14px;
+    border-radius: 14px 3px 3px 14px;
     padding: 0 7px 2px;
   }
 }
 
 .field-country {
   max-width: $form-width;
-  margin: auto;
+  margin: 5px auto;
   form {
     display: flex;
     gap: 5px;
@@ -1130,6 +1132,10 @@ main {
       }
     }
   }
+}
+
+.figure-off {
+  margin-top: 4rem;
 }
 
 .product-grid {
