@@ -18,6 +18,7 @@
     <div
       @click.stop
       class="menu-categories"
+      ref="menuCategories"
       :class="{ expand: state.canShowCategories && !$props.hasCollapsed }"
     >
       <div class="menu-head">
@@ -29,10 +30,10 @@
         </button>
         <div class="field-search">
           <form @submit.prevent>
-            <label for="search-input">Search:</label>
+            <label for="search-category-input">Search:</label>
             <input
               type="search"
-              id="search-input"
+              id="search-category-input"
               ref="categorySearch"
               aria-label="Search for a category"
               v-model="state.searchCategoryTerm"
@@ -63,6 +64,8 @@
             @click.stop="displayCategories()"
           >
             |-> Categories
+            <!-- <a href="search-category-input" @click.prevent> 
+              </a> -->
           </button>
           <button
             class="btn-categories btn-goud lefty"
@@ -612,7 +615,19 @@ export default defineComponent({
     const displayCategories = () => {
       state.canShowCategories = true;
       context.emit("open-up");
-      categorySearch.value?.focus();
+      const categorySearchElement = categorySearch.value;
+      if (categorySearchElement) categorySearchElement.focus();
+
+      const menuCategoriesElement = menuCategories.value;
+      if (menuCategoriesElement) {
+        const rect = menuCategoriesElement.getBoundingClientRect();
+        if (rect.top < 0) {
+          menuCategoriesElement.scrollIntoView(true);
+          menuCategoriesElement.style.maxHeight = "100vh";
+        } else {
+          menuCategoriesElement.style.maxHeight = "";
+        }
+      }
     };
 
     const getProductsByCategory = async (category: Tag, page = 1) => {
@@ -719,9 +734,11 @@ export default defineComponent({
           return "unknown";
       }
     };
+    const menuCategories = ref<null | HTMLDivElement>(null);
     const categorySearch = ref<null | HTMLInputElement>(null);
     const productView = ref<null | HTMLDivElement>(null);
     return {
+      menuCategories,
       categorySearch,
       productView,
       state,
@@ -799,7 +816,7 @@ $focus-color: rgb(108, 202, 233);
 .container {
   position: relative;
   display: grid;
-  grid-template-rows: 150px 1fr;
+  grid-template-rows: 8rem 1fr;
   box-sizing: border-box;
   height: 100vh;
   height: -webkit-fill-available;
@@ -841,12 +858,15 @@ $focus-color: rgb(108, 202, 233);
 header {
   color: $goud-beige;
   position: relative;
+  padding-bottom: 1rem;
   h1 {
     font-size: 2.5rem;
     font-weight: bold;
     text-shadow: 2px 2px #595959;
+    margin-bottom: 0.5rem;
   }
   h2 {
+    margin: 0;
     font-size: 1.3rem;
     font-weight: bold;
     text-shadow: 1px 1px #595959;
@@ -1049,11 +1069,10 @@ main {
   position: absolute;
   z-index: 1234;
   left: 0;
-  top: 170px;
-  bottom: 0;
+  top: 9rem;
   overflow: auto;
   background-color: $goud-green;
-  max-height: 760px;
+  max-height: calc(100vh - 9rem);
   max-width: 100%;
   width: 28rem;
   transform: translateX(-100%);
@@ -1421,6 +1440,7 @@ figcaption {
 
 .note {
   width: 100%;
-  padding-bottom: 10px;
+  padding: 0 5px;
+  box-sizing: border-box;
 }
 </style>
