@@ -1361,6 +1361,9 @@ main {
     .nutriscore-img {
       filter: drop-shadow(0px 0px 1px #000);
     }
+    .novagroup-img {
+      margin-left: 1rem;
+    }
     .ecoscore-img {
       height: 50px;
       filter: drop-shadow(0px 0px 1px #000);
