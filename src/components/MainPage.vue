@@ -864,7 +864,7 @@ header {
     font-size: 2.5rem;
     font-weight: bold;
     text-shadow: 2px 2px #595959;
-    margin-bottom: 0.5rem;
+    margin: 1rem 0 0.5rem;
   }
   h2 {
     margin: 0;
