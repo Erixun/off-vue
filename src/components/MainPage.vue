@@ -99,7 +99,7 @@
             </div>
           </form>
         </div>
-        <h3 v-else class="category-header">
+        <h3 v-else class="category-header" :class="{ uppity: !isMobile }">
           Category - {{ state.selectedCategory.name }}
           <button class="btn-goud abs x" @click="resetToDefault()">
             &times;
@@ -986,8 +986,8 @@ header {
   align-items: center;
   gap: 6px;
 
-  @media screen and (min-width: 650px) {
-    margin-top: -40px;
+  &.uppity {
+    margin-top: -36px;
   }
 
   .x {
