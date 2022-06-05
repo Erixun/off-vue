@@ -1270,6 +1270,7 @@ main {
     border-radius: 7px 7px 0 0;
     background-color: white;
     margin: 0;
+    padding: 0;
     .page {
       padding: 5px 8px;
       background-color: lightgray;
