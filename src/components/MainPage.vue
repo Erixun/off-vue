@@ -1370,7 +1370,7 @@ main {
     list-style: none;
     display: flex;
     justify-content: center;
-    gap: 0.6rem;
+    gap: 0.5rem;
     max-width: 100vw;
     padding: 0; //4px;
     // border: 1px solid $border-color-base;
@@ -1445,13 +1445,14 @@ main {
     }
 
     .btn-dismiss {
-      position: absolute;
+      justify-self: flex-end;
+      position: sticky;
       cursor: pointer;
-      top: 10px;
-      right: 15px;
-      width: 40px;
-      height: 40px;
-      line-height: 1rem;
+      top: -15px;
+      right: -15px;
+      // width: 40px;
+      // height: 40px;
+      // line-height: 1rem;
       font-size: 1rem;
       // padding: 11px 14px;
       font-weight: bold;
@@ -1463,6 +1464,9 @@ main {
       color: white;
       background-color: $btn-x-color;
       border-color: $btn-x-color;
+
+      padding: 0.5rem 0.7rem;
+      margin: -19px;
       &:hover {
         background-color: #444;
         border-color: #444;
