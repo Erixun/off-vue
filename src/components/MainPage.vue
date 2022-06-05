@@ -148,10 +148,11 @@
           <img
             id="logo"
             src="../assets/openfoodfacts-logo-en.png"
+            rel="preload"
             alt="Open Food Facts logo"
             style="margin-bottom: 0.5rem"
             width="178"
-            height="150"
+            height="144"
           />
         </a>
       </figure>
