@@ -5,12 +5,6 @@
       'no-scroll': state.selectedProduct || hasExpandedCategories,
     }"
   >
-    <header>
-      <h1>Goud</h1>
-      <h2><i>rated foods for common good</i></h2>
-      <div class="header-bg"></div>
-    </header>
-
     <div class="spinner-backdrop" v-if="state.isGettingFood">
       <div class="spinner"></div>
     </div>
@@ -22,12 +16,6 @@
       :class="{ expand: state.canShowCategories && !$props.hasCollapsed }"
     >
       <div class="menu-head">
-        <button
-          class="btn-shut-drawer btn-goud lefty"
-          @click="hideCategories()"
-        >
-          |&lt;-
-        </button>
         <div class="field-search">
           <form @submit.prevent>
             <!-- <label for="search-category-input">Search:</label> -->
@@ -42,6 +30,12 @@
             />
           </form>
         </div>
+        <button
+          class="btn-shut-drawer btn-goud lefty"
+          @click="hideCategories()"
+        >
+          |&lt;-
+        </button>
       </div>
       <ul class="list-categories">
         <li
@@ -56,9 +50,11 @@
         </li>
       </ul>
     </div>
-    <main>
+
+    <!-- <div class="cpanel-wrapper"> -->
+    <header>
       <div class="control-panel">
-        <div class="drawer-btns">
+        <div class="drawer-btns" v-if="!isMobile()">
           <button
             class="btn-categories btn-goud righty"
             @click.stop="displayCategories()"
@@ -131,6 +127,34 @@
           </form>
         </div>
       </div>
+      <div class="banner" v-if="!state.hasExecutedSearch">
+        <h1>Goud</h1>
+        <h2><i>rated foods for common good</i></h2>
+        <!-- <header>
+      <div class="header-bg"></div>
+    </header> -->
+      </div>
+    </header>
+    <!-- </div> -->
+    <main>
+      <figure
+        v-if="
+          !state.hasExecutedSearch && !hasProducts() && !state.isGatheringFoods
+        "
+        class="figure-off"
+      >
+        <figcaption>An app based on</figcaption>
+        <a href="https://world.openfoodfacts.org/" target="_blank">
+          <img
+            id="logo"
+            src="../assets/openfoodfacts-logo-en.png"
+            alt="Open Food Facts logo"
+            style="margin-bottom: 0.5rem"
+            width="178"
+            height="150"
+          />
+        </a>
+      </figure>
       <section class="section-products">
         <ul class="product-grid">
           <li
@@ -202,59 +226,94 @@
         >
           Sorry, no foods found...
         </p>
-        <div class="page-list-wrapper">
-          <!-- && !state.isGatheringFoods" -->
-          <ol class="page-list" v-if="state.pages.length > 1">
-            <li
-              v-if="state.currentPage != 1"
-              class="page prev"
-              @click="getPage(state.currentPage - 1)"
+        <!-- <div class="pagination">
+            <button
+              class="btn-goud btn-prev"
+              :disabled="state.page === 1"
+              @click="getPreviousPage()"
             >
-              &lt;
-            </li>
-            <li
-              class="page"
-              :class="{
-                current: state.currentPage === +page,
-                ellipsis: page === '...',
-              }"
-              v-for="(page, i) of state.pages"
-              :key="i"
-              @click="getPage(+page)"
+              &lt;&lt;
+            </button>
+            <span class="page-number">
+              Page {{ state.page }} of {{ state.totalPages }}
+            </span>
+            <button
+              class="btn-goud btn-next"
+              :disabled="state.page === state.totalPages"
+              @click="getNextPage()"
             >
-              {{ page }}
-            </li>
-            <li
-              v-if="state.currentPage != state.allPages.length"
-              @click="getPage(state.currentPage + 1)"
-              class="page next"
-            >
-              &gt;
-            </li>
-          </ol>
-        </div>
-        <figure
-          v-if="
-            !state.hasExecutedSearch &&
-            !hasProducts() &&
-            !state.isGatheringFoods
-          "
-          class="figure-off"
-        >
-          <figcaption>An app based on</figcaption>
-          <a href="https://world.openfoodfacts.org/" target="_blank">
-            <img
-              id="logo"
-              src="../assets/openfoodfacts-logo-en.png"
-              alt="Open Food Facts logo"
-              style="margin-bottom: 0.5rem"
-              width="178"
-              height="150"
-            />
-          </a>
-        </figure>
+              &gt;&gt;
+            </button>
+          </div> -->
       </section>
+      <p
+        class="note"
+        v-if="
+          !state.hasExecutedSearch && !hasProducts() && !state.isGatheringFoods
+        "
+      >
+        <b>Note:</b> some of the products are incomplete, and their associated
+        data may be incorrect. <br />You are more than welcome to improve
+        existing products, or add your own, via
+        <a
+          href="https://world.openfoodfacts.org/open-food-facts-mobile-app"
+          target="_blank"
+        >
+          the official Open Food Facts-app.
+        </a>
+      </p>
     </main>
+    <footer class="bottom-panel">
+      <button
+        v-if="isMobile()"
+        class="btn-categories btn-goud righty"
+        @click.stop="displayCategories()"
+      >
+        Categories
+        <!-- <a href="search-category-input" @click.prevent> 
+              </a> -->
+      </button>
+      <div class="pagination">
+        <!-- && !state.isGatheringFoods" -->
+        <ol class="page-list" v-if="state.pages.length > 1">
+          <li
+            v-if="state.currentPage != 1"
+            class="page prev"
+            @click="getPage(state.currentPage - 1)"
+          >
+            &lt;
+          </li>
+          <li
+            class="page"
+            :class="{
+              current: state.currentPage === +page,
+              ellipsis: page === '...',
+            }"
+            v-for="(page, i) of state.pages"
+            :key="i"
+            @click="getPage(+page)"
+          >
+            {{ page }}
+          </li>
+          <li
+            v-if="state.currentPage != state.allPages.length"
+            @click="getPage(state.currentPage + 1)"
+            class="page next"
+          >
+            &gt;
+          </li>
+        </ol>
+      </div>
+      <button
+        v-if="isMobile()"
+        class="btn-categories btn-goud lefty"
+        disabled
+        @click.stop="displayCategories()"
+      >
+        Options
+      </button>
+    </footer>
+
     <div
       class="product-view"
       ref="productView"
@@ -435,22 +494,6 @@
         </div>
       </div>
     </div>
-    <p
-      class="note"
-      v-if="
-        !state.hasExecutedSearch && !hasProducts() && !state.isGatheringFoods
-      "
-    >
-      <b>Note:</b> some of the products are incomplete, and their associated
-      data may be incorrect. <br />You are more than welcome to improve existing
-      products, or add your own, via
-      <a
-        href="https://world.openfoodfacts.org/open-food-facts-mobile-app"
-        target="_blank"
-      >
-        the official Open Food Facts-app.
-      </a>
-    </p>
   </div>
 </template>
 
@@ -480,6 +523,7 @@ export default defineComponent({
     const state = reactive<{
       countries: Array<Tag>;
       selectedCountry: null | Tag;
+      previousCountry: null | Tag;
       canShowCategories: boolean;
       categories: Array<Tag>;
       selectedCategory: null | Tag;
@@ -499,6 +543,7 @@ export default defineComponent({
     }>({
       countries: Array<Tag>(),
       selectedCountry: null,
+      previousCountry: null,
       canShowCategories: false,
       categories: Array<Tag>(),
       selectedCategory: null,
@@ -540,15 +585,32 @@ export default defineComponent({
       state.isGettingFood = true;
     };
 
+    const isMobile = () => {
+      return window.innerWidth < 768;
+    };
+
+    const isInvalidSearch = (page: number) => {
+      const currentSearchTerm = state.searchTerm ?? "";
+      const isSameSearch = currentSearchTerm === state.previousSearchTerm;
+      const isEmptySearch = currentSearchTerm === "";
+      const isCountryUnchanged =
+        state.selectedCountry?.id === state.previousCountry?.id;
+      const isSamePage = page === state.currentPage;
+      const isBadReSearch = isSameSearch && isCountryUnchanged && isSamePage;
+
+      return isEmptySearch || isBadReSearch;
+    };
+
     const execSearch = async (page = 1) => {
-      if (!state.searchTerm || state.searchTerm === state.previousSearchTerm)
-        return;
-      state.previousSearchTerm = state.searchTerm;
+      if (isInvalidSearch(page)) return;
+
+      state.previousSearchTerm = state.searchTerm!;
+      state.previousCountry = state.selectedCountry;
       initLoading();
 
       const countryId = state.selectedCountry ? state.selectedCountry.id : "";
       const response = await OFF.findProductsBySearchTerm(
-        state.searchTerm,
+        state.searchTerm!,
         page,
         countryId
       ).catch((e) => {
@@ -558,6 +620,7 @@ export default defineComponent({
 
       if (response.products.length === 0) {
         // state.isGatheringFoods = false;
+        state.products = [];
         state.isGettingFood = false;
         return;
       }
@@ -571,29 +634,20 @@ export default defineComponent({
         (p) => (p.brands = p.brands?.split(",").join(", "))
       );
 
-      handlePages(response);
+      getInitialPages(response);
 
       // state.isGatheringFoods = false;
       state.isGettingFood = false;
       state.lastRequest = "search";
     };
 
-    const handlePages = (response: ProductsResponse) => {
+    const getInitialPages = (response: ProductsResponse) => {
       const emptyPages = Array(Math.floor(response.count / response.page_size));
       const everyPage = [...emptyPages].map((_, i) => `${i + 1}`);
       state.allPages = everyPage;
 
-      if (everyPage.length < 6) {
-        state.pages = everyPage;
-      } else {
-        // const firstThree = everyPage.slice(0, 3);
-        // const end = everyPage.length;
-        // const lastThree = everyPage.slice(end - 3, end);
-
-        // const pages = [...firstThree, "...", ...lastThree];
-        const pages = everyPage.slice(0, 5);
-        state.pages = pages;
-      }
+      const isFewPages = everyPage.length <= 5;
+      state.pages = isFewPages ? everyPage : everyPage.slice(0, 3);
     };
 
     const getPage = async (page: number) => {
@@ -605,42 +659,15 @@ export default defineComponent({
 
       state.currentPage = page;
 
-      if (state.allPages.length < 6) return;
-      if (
-        page < +state.pages[0] ||
-        page > +state.pages[state.pages.length - 1]
-      ) {
-        state.pages = state.allPages.slice(page - 3, page + 2);
+      if (state.allPages.length < 4) return;
+
+      const isPageOutOfRange =
+        page < +state.pages[0] || +state.pages[state.pages.length - 1] < page;
+
+      if (isPageOutOfRange) {
+        state.pages = state.allPages.slice(page - 2, page + 1);
       }
-
-      // const surroundingPages = [
-      //   page - 2,
-      //   page - 1,
-      //   page,
-      //   page + 1,
-      //   page + 2,
-      // ].filter((p) => 0 < p && p < state.allPages.length);
-
-      // state.pages = surroundingPages.map((p) => `${p}`);
-
-      // if (5 < surroundingPages[0]) {
-      //   surroundingPages.unshift(NaN);
-      // }
-      // if (surroundingPages[4] < +state.allPages[state.allPages.length - 4]) {
-      //   surroundingPages.push(NaN);
-      // }
-
-      // const first = [1, 2, 3].filter((p) => !surroundingPages.includes(p));
-      // const last = getLastThree().filter((p) => !surroundingPages.includes(+p));
-      // const pagesNums = [...first, ...surroundingPages, ...last];
-      // state.pages = pagesNums.map((p) => String(+p || "..."));
     };
-
-    // const getLastThree = () => {
-    //   const end = state.allPages.length;
-    //   const lastThree = state.allPages.slice(end - 3, end);
-    //   return lastThree;
-    // };
 
     const filterCategories = () => {
       if (!state.searchCategoryTerm) return;
@@ -663,7 +690,7 @@ export default defineComponent({
       const menuCategoriesElement = menuCategories.value;
       if (menuCategoriesElement) {
         const rect = menuCategoriesElement.getBoundingClientRect();
-        console.log(rect);
+        // console.log(rect);
         if (rect.top < 1) {
           menuCategoriesElement.scrollIntoView(true);
           menuCategoriesElement.style.maxHeight = "100vh";
@@ -691,7 +718,7 @@ export default defineComponent({
                 new Set(p.brands?.split(",").map((b) => b.trim()))
               ).join(", "))
           );
-          if (page === 1) handlePages(response);
+          if (page === 1) getInitialPages(response);
         })
         .catch((e) => {
           console.error(e);
@@ -846,6 +873,7 @@ export default defineComponent({
       hasCleared,
       hasProducts,
       dismissProduct,
+      isMobile,
     };
   },
 });
@@ -861,14 +889,12 @@ $btn-x-color: #222;
 .container {
   position: relative;
   display: grid;
-  grid-template-rows: 8rem 1fr;
+  grid-template-rows: auto 1fr auto;
   box-sizing: border-box;
   height: 100vh;
-  height: -webkit-fill-available;
-  overflow-x: hidden;
-  &.no-scroll {
-    overflow-y: hidden;
-  }
+  min-height: -webkit-fill-available;
+  max-height: -webkit-fill-available;
+  overflow: hidden;
 
   .spinner-backdrop {
     position: fixed;
@@ -901,20 +927,26 @@ $btn-x-color: #222;
   }
 }
 header {
-  color: $goud-beige;
   position: relative;
-  padding-bottom: 1rem;
-  h1 {
-    font-size: 2.5rem;
-    font-weight: bold;
-    text-shadow: 2px 2px #595959;
-    margin: 1rem 0 0.5rem;
-  }
-  h2 {
-    margin: 0;
-    font-size: 1.3rem;
-    font-weight: bold;
-    text-shadow: 1px 1px #595959;
+  z-index: 12;
+  // padding-bottom: 1rem;
+  .banner {
+    color: $goud-beige;
+    background-color: $goud-green;
+    padding: 1rem;
+    border-bottom: 1px solid $border-color-base;
+    h1 {
+      font-size: 2.5rem;
+      font-weight: bold;
+      text-shadow: 2px 2px #595959;
+      margin: 0 0 0.5rem;
+    }
+    h2 {
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: bold;
+      text-shadow: 1px 1px #595959;
+    }
   }
   .header-bg {
     position: absolute;
@@ -931,20 +963,24 @@ header {
 }
 main {
   position: relative;
-  margin-top: 1.5rem;
+  padding-top: 1rem;
   max-width: 100vw;
   display: flex;
   flex-direction: column;
+  // justify-content: space-around;
+  overflow: hidden auto;
 
-  @media screen and (max-width: 600px) {
-    margin-top: 1rem;
-  }
+  // @media screen and (max-width: 600px) {
+  //   padding-top: 0.5rem;
+  // }
 }
 .control-panel {
   padding: 5px;
-  position: sticky;
+  // position: absolute;
+  width: 100%;
+  box-sizing: border-box;
   z-index: 123;
-  top: 0;
+  // top: 0;
   background-color: $goud-beige;
   box-shadow: 0px 2px 3px #5959593b;
 }
@@ -961,7 +997,7 @@ main {
   font-size: 16px;
 
   @media screen and (min-width: 650px) {
-    margin-top: -30px;
+    margin-top: -36px;
   }
 
   &:focus-within {
@@ -1115,16 +1151,17 @@ main {
 
 .menu-categories {
   outline: 1px solid $border-color-base;
-  border-radius: 4px;
+  border-radius: 0 4px 4px 0;
   position: absolute;
   z-index: 1234;
   left: 0;
-  top: 9rem;
+  top: 0; //9rem;
   overflow: auto;
   background-color: $goud-green;
   height: 100vh;
-  min-height: calc(100vh - 9rem);
-  max-height: calc(100vh - 9rem);
+  height: -webkit-fill-available;
+  // min-height: calc(100vh - 9rem);
+  // max-height: calc(100vh - 9rem);
   max-width: 100%;
   width: 28rem;
   transform: translateX(-100%);
@@ -1187,13 +1224,13 @@ main {
 }
 
 .figure-off {
-  margin-top: 4rem;
+  margin-top: 1rem;
 }
 
 .product-grid {
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   padding: 1rem 3rem;
   grid-column-gap: 15px;
   grid-row-gap: 30px;
@@ -1217,6 +1254,7 @@ main {
   display: grid;
   grid-template: 2fr 3fr / 1fr;
   max-width: 200px;
+  box-sizing: border-box;
 
   @media screen and (max-width: 500px) {
     grid-template: unset;
@@ -1297,13 +1335,36 @@ main {
   }
 }
 
-.page-list-wrapper {
+.bottom-panel {
+  padding: 0.5rem;
+  // background-color: $goud-green;
+  // color: whitesmoke;
+  text-align: center;
+  font-size: 0.8rem;
+  // position: fixed;
+  // bottom: 0;
+  width: 100%;
+  z-index: 1;
+  display: flex;
+  font-family: "Roboto", sans-serif;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  height: 3rem;
+  // align-items: center;
+  justify-content: space-between;
+  box-shadow: 0px -2px 3px rgba(89, 89, 89, 0.231372549);
+  box-sizing: border-box;
+  // padding: 1rem;
+}
+
+.pagination {
   display: flex;
   justify-content: center;
   z-index: 123;
+  margin: auto;
   // position: relative;
-  position: sticky;
-  bottom: 0;
+  // position: sticky;
+  // bottom: 0;
 
   .page-list {
     list-style: none;
@@ -1311,11 +1372,11 @@ main {
     justify-content: center;
     gap: 0.6rem;
     max-width: 100vw;
-    padding: 4px;
-    border: 1px solid $border-color-base;
+    padding: 0; //4px;
+    // border: 1px solid $border-color-base;
     border-radius: 7px 7px 0 0;
     background-color: white;
-    margin: 5px 0 0;
+    margin: 0;
     .page {
       padding: 5px 8px;
       background-color: lightgray;
@@ -1391,7 +1452,7 @@ main {
       width: 40px;
       height: 40px;
       line-height: 1rem;
-      // font-size: 1.4rem;
+      font-size: 1rem;
       // padding: 11px 14px;
       font-weight: bold;
       // font-size: inherit;
@@ -1519,5 +1580,7 @@ figcaption {
   width: 100%;
   padding: 0 5px;
   box-sizing: border-box;
+  position: absolute;
+  bottom: 10px;
 }
 </style>
