@@ -4,6 +4,7 @@
     :class="{
       'no-scroll': state.selectedProduct || hasExpandedCategories,
     }"
+    @click="hideCategories()"
   >
     <div class="spinner-backdrop" v-if="state.isGettingFood">
       <div class="spinner"></div>
@@ -13,12 +14,11 @@
       @click.stop
       class="menu-categories"
       ref="menuCategories"
-      :class="{ expand: state.canShowCategories && !$props.hasCollapsed }"
+      :class="{ expand: state.canShowCategories }"
     >
       <div class="menu-head">
         <div class="field-search">
           <form @submit.prevent>
-            <!-- <label for="search-category-input">Search:</label> -->
             <input
               type="search"
               id="search-category-input"
@@ -51,17 +51,14 @@
       </ul>
     </div>
 
-    <!-- <div class="cpanel-wrapper"> -->
     <header>
       <div class="control-panel">
-        <div class="drawer-btns" v-if="!isMobile()">
+        <div class="drawer-btns" v-if="!isMobile">
           <button
             class="btn-categories btn-goud righty"
             @click.stop="displayCategories()"
           >
             |-> Categories
-            <!-- <a href="search-category-input" @click.prevent> 
-              </a> -->
           </button>
           <button
             class="btn-categories btn-goud lefty"
@@ -73,7 +70,6 @@
         </div>
         <div class="field-search" v-if="state.selectedCategory === null">
           <form @submit.prevent>
-            <!-- <label for="search-input">Search:</label> -->
             <input
               type="search"
               id="search-input"
@@ -104,7 +100,6 @@
           <button class="btn-goud abs x" @click="resetToDefault()">
             &times;
           </button>
-          <!-- ╳ -->
         </h3>
         <div class="field-country">
           <form @submit.prevent>
@@ -130,15 +125,11 @@
       <div class="banner" v-if="!state.hasExecutedSearch">
         <h1>Goud</h1>
         <h2><i>rated foods for common good</i></h2>
-        <!-- <header>
-      <div class="header-bg"></div>
-    </header> -->
       </div>
     </header>
-    <!-- </div> -->
     <main>
       <figure
-        v-if="
+        v-show="
           !state.hasExecutedSearch && !hasProducts() && !state.isGatheringFoods
         "
         class="figure-off"
@@ -214,9 +205,6 @@
             </div>
           </li>
         </ul>
-        <!-- <p v-if="state.isGatheringFoods" class="load-text">
-          Gathering foods...
-        </p> -->
         <p
           v-if="
             !state.isGettingFood &&
@@ -227,25 +215,6 @@
         >
           Sorry, no foods found...
         </p>
-        <!-- <div class="pagination">
-            <button
-              class="btn-goud btn-prev"
-              :disabled="state.page === 1"
-              @click="getPreviousPage()"
-            >
-              &lt;&lt;
-            </button>
-            <span class="page-number">
-              Page {{ state.page }} of {{ state.totalPages }}
-            </span>
-            <button
-              class="btn-goud btn-next"
-              :disabled="state.page === state.totalPages"
-              @click="getNextPage()"
-            >
-              &gt;&gt;
-            </button>
-          </div> -->
       </section>
       <p
         class="note"
@@ -266,16 +235,13 @@
     </main>
     <footer class="bottom-panel">
       <button
-        v-if="isMobile()"
+        v-if="isMobile"
         class="btn-categories btn-goud righty"
         @click.stop="displayCategories()"
       >
         Categories
-        <!-- <a href="search-category-input" @click.prevent> 
-              </a> -->
       </button>
       <div class="pagination">
-        <!-- && !state.isGatheringFoods" -->
         <ol class="page-list" v-if="state.pages.length > 1">
           <li
             v-if="state.currentPage != 1"
@@ -306,7 +272,7 @@
         </ol>
       </div>
       <button
-        v-if="isMobile()"
+        v-if="isMobile"
         class="btn-categories btn-goud lefty"
         disabled
         @click.stop="displayCategories()"
@@ -513,14 +479,7 @@ import categories from "@/assets/categories.json";
 import NullProductsResponse from "@/constant/NullProductsResponse";
 
 export default defineComponent({
-  props: {
-    hasCollapsed: {
-      type: Boolean,
-      required: true,
-    },
-  },
-  emits: ["open-up"],
-  setup(props, context) {
+  setup() {
     const state = reactive<{
       countries: Array<Tag>;
       selectedCountry: null | Tag;
@@ -532,7 +491,6 @@ export default defineComponent({
       previousSearchTerm: string;
       searchCategoryTerm: null | string;
       products: Array<Product>;
-      isGatheringFoods: boolean;
       isGettingFood: boolean;
       hasExecutedSearch: boolean;
       allPages: string[];
@@ -541,6 +499,7 @@ export default defineComponent({
       selectedProduct: null | Product;
       hasProductInView: boolean;
       lastRequest: "" | "search" | "category";
+      isMobile: boolean;
     }>({
       countries: Array<Tag>(),
       selectedCountry: null,
@@ -552,7 +511,6 @@ export default defineComponent({
       previousSearchTerm: "",
       searchCategoryTerm: null,
       products: Array<Product>(),
-      isGatheringFoods: false,
       isGettingFood: false,
       hasExecutedSearch: false,
       allPages: [],
@@ -561,11 +519,13 @@ export default defineComponent({
       selectedProduct: null,
       hasProductInView: false,
       lastRequest: "",
+      isMobile: true,
     });
 
     const OFF = new OFFApi();
 
     onBeforeMount(async () => {
+      setIsMobile();
       state.categories = categories.tags
         .filter((t) => t.id.startsWith("en:") && t.products > 1000)
         .sort((a, z) => (a.name > z.name ? 1 : -1));
@@ -574,20 +534,13 @@ export default defineComponent({
         a.name > z.name ? 1 : -1
       );
     });
-
-    const logInput = () => {
-      console.log(state.searchTerm);
+    const setIsMobile = () => {
+      state.isMobile = window.innerWidth < 768;
     };
 
     const initLoading = () => {
       state.hasExecutedSearch = true;
-      // state.products = [];
-      // state.isGatheringFoods = true;
       state.isGettingFood = true;
-    };
-
-    const isMobile = () => {
-      return window.innerWidth < 768;
     };
 
     const isInvalidSearch = (page: number) => {
@@ -620,7 +573,6 @@ export default defineComponent({
       });
 
       if (response.products.length === 0) {
-        // state.isGatheringFoods = false;
         state.products = [];
         state.isGettingFood = false;
         return;
@@ -637,7 +589,6 @@ export default defineComponent({
 
       getInitialPages(response);
 
-      // state.isGatheringFoods = false;
       state.isGettingFood = false;
       state.lastRequest = "search";
     };
@@ -684,21 +635,6 @@ export default defineComponent({
 
     const displayCategories = () => {
       state.canShowCategories = true;
-      context.emit("open-up");
-      const categorySearchElement = categorySearch.value;
-      if (categorySearchElement) categorySearchElement.focus();
-
-      const menuCategoriesElement = menuCategories.value;
-      if (menuCategoriesElement) {
-        const rect = menuCategoriesElement.getBoundingClientRect();
-        // console.log(rect);
-        if (rect.top < 1) {
-          menuCategoriesElement.scrollIntoView(true);
-          menuCategoriesElement.style.maxHeight = "100vh";
-        } else {
-          menuCategoriesElement.style.maxHeight = "";
-        }
-      }
     };
 
     const getProductsByCategory = async (category: Tag, page = 1) => {
@@ -709,7 +645,6 @@ export default defineComponent({
       const country_tag = state.selectedCountry?.id ?? "";
       OFF.findProductsByCategory(category.id, page, country_tag)
         .then((response) => {
-          // console.log(response);
           state.products = response.products.filter(
             (p) => p.product_name && p.image_front_thumb_url
           );
@@ -725,7 +660,6 @@ export default defineComponent({
           console.error(e);
         })
         .finally(() => {
-          // state.isGatheringFoods = false;
           state.isGettingFood = false;
           state.currentPage = page;
           state.lastRequest = "category";
@@ -750,7 +684,6 @@ export default defineComponent({
       state.isGettingFood = true;
       await OFF.findProductByBarcode(barCode)
         .then((response) => {
-          // console.log(response);
           state.selectedProduct = response;
           if (response && response.brands) {
             state.selectedProduct!.brands = Array.from(
@@ -766,7 +699,6 @@ export default defineComponent({
         state.isGettingFood = false;
         state.hasProductInView = true;
         productView.value?.focus();
-        productView.value?.scrollIntoView();
       }, 0);
     };
 
@@ -855,14 +787,11 @@ export default defineComponent({
         );
       }),
       hasExpandedCategories: computed(
-        () =>
-          state.canShowCategories &&
-          !props.hasCollapsed &&
-          !state.hasProductInView
+        () => state.canShowCategories && !state.hasProductInView
       ),
+      isMobile: computed(() => state.isMobile),
       describeEcoScore,
       getPage,
-      logInput,
       execSearch,
       filterCategories,
       displayCategories,
@@ -874,7 +803,6 @@ export default defineComponent({
       hasCleared,
       hasProducts,
       dismissProduct,
-      isMobile,
     };
   },
 });
@@ -927,10 +855,20 @@ $btn-x-color: #222;
     }
   }
 }
+
 header {
   position: relative;
   z-index: 12;
-  // padding-bottom: 1rem;
+
+  .control-panel {
+    padding: 5px;
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 123;
+    background-color: $goud-beige;
+    box-shadow: 0px 2px 3px #5959593b;
+  }
+
   .banner {
     color: $goud-beige;
     background-color: $goud-green;
@@ -949,41 +887,14 @@ header {
       text-shadow: 1px 1px #595959;
     }
   }
-  .header-bg {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: $goud-green;
-    border-radius: 0 0 50% 50%;
-    z-index: -1;
-    height: 200%;
-    width: 200%;
-    transform: translateX(-25%);
-  }
 }
-main {
-  position: relative;
-  padding-top: 1rem;
-  max-width: 100vw;
-  display: flex;
-  flex-direction: column;
-  // justify-content: space-around;
-  overflow: hidden auto;
 
-  // @media screen and (max-width: 600px) {
-  //   padding-top: 0.5rem;
-  // }
-}
-.control-panel {
-  padding: 5px;
-  // position: absolute;
-  width: 100%;
-  box-sizing: border-box;
-  z-index: 123;
-  // top: 0;
-  background-color: $goud-beige;
-  box-shadow: 0px 2px 3px #5959593b;
+.drawer-btns {
+  display: flex;
+  justify-content: space-between;
+  max-width: min(1300px, 100%);
+  margin: 5px auto;
+  height: 2rem;
 }
 
 .field-search {
@@ -1017,12 +928,6 @@ main {
     grid-template-areas: "search-field action";
     align-items: center;
 
-    // label {
-    //   margin-bottom: -2px;
-    //   white-space: nowrap;
-    //   grid-area: search-label;
-    // }
-
     input {
       border: none;
       font-size: inherit;
@@ -1041,8 +946,8 @@ main {
       justify-content: space-between;
       gap: 5px;
       .x {
-        background-color: $btn-x-color; //#888;
-        border-color: $btn-x-color; //#888;
+        background-color: $btn-x-color;
+        border-color: $btn-x-color;
         height: 28px;
         width: 30px;
         padding: 0;
@@ -1062,20 +967,8 @@ main {
       justify-content: center;
       align-items: center;
       justify-self: end;
-      &:hover {
-        background-color: $goud-green;
-      }
     }
   }
-}
-
-.drawer-btns {
-  display: flex;
-  justify-content: space-between;
-  max-width: min(1300px, 100%);
-  margin: 5px auto;
-  height: 2rem;
-  // padding: 0px 0 10px;
 }
 
 .category-header {
@@ -1093,11 +986,9 @@ main {
   }
 
   .x {
-    background-color: $btn-x-color; //#888;
-    border-color: $btn-x-color; //#888;
-    // line-height: 0.5;
+    background-color: $btn-x-color;
+    border-color: $btn-x-color;
     padding: 0;
-    // font-weight: bold;
     font-size: 1rem;
     width: 1.5rem;
     height: 1.5rem;
@@ -1113,7 +1004,6 @@ main {
   background-color: rgb(2, 127, 2);
   border: 2px solid rgb(2, 127, 2);
   border-radius: 14px;
-  // padding: 2px;
   color: whitesmoke;
   font-size: 1rem;
   cursor: pointer;
@@ -1156,13 +1046,11 @@ main {
   position: absolute;
   z-index: 1234;
   left: 0;
-  top: 0; //9rem;
+  top: 0;
   overflow: auto;
   background-color: $goud-green;
   height: 100vh;
   height: -webkit-fill-available;
-  // min-height: calc(100vh - 9rem);
-  // max-height: calc(100vh - 9rem);
   max-width: 100%;
   width: 28rem;
   transform: translateX(-100%);
@@ -1184,7 +1072,7 @@ main {
     padding: 9px 8px 0;
 
     .btn-shut-drawer {
-      background-color: $btn-x-color; //#888;-x-color
+      background-color: $btn-x-color;
       border-color: $btn-x-color;
       color: whitesmoke;
 
@@ -1224,6 +1112,15 @@ main {
   }
 }
 
+main {
+  position: relative;
+  padding-top: 1rem;
+  max-width: 100vw;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden auto;
+}
+
 .figure-off {
   margin-top: 1rem;
 }
@@ -1231,7 +1128,7 @@ main {
 .product-grid {
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   padding: 1rem 3rem;
   grid-column-gap: 15px;
   grid-row-gap: 30px;
@@ -1254,6 +1151,7 @@ main {
   box-shadow: rgba(119, 119, 119, 0.35) 0px 0px 0.357143rem 0px;
   display: grid;
   grid-template: 2fr 3fr / 1fr;
+  min-width: 200px;
   max-width: 200px;
   box-sizing: border-box;
 
@@ -1338,12 +1236,8 @@ main {
 
 .bottom-panel {
   padding: 0.5rem;
-  // background-color: $goud-green;
-  // color: whitesmoke;
   text-align: center;
   font-size: 0.8rem;
-  // position: fixed;
-  // bottom: 0;
   width: 100%;
   z-index: 1;
   display: flex;
@@ -1351,11 +1245,9 @@ main {
   font-weight: 300;
   letter-spacing: 0.5px;
   height: 3rem;
-  // align-items: center;
   justify-content: space-between;
   box-shadow: 0px -2px 3px rgba(89, 89, 89, 0.231372549);
   box-sizing: border-box;
-  // padding: 1rem;
 }
 
 .pagination {
@@ -1363,9 +1255,6 @@ main {
   justify-content: center;
   z-index: 123;
   margin: auto;
-  // position: relative;
-  // position: sticky;
-  // bottom: 0;
 
   .page-list {
     list-style: none;
@@ -1373,8 +1262,6 @@ main {
     justify-content: center;
     gap: 0.5rem;
     max-width: 100vw;
-    padding: 0; //4px;
-    // border: 1px solid $border-color-base;
     border-radius: 7px 7px 0 0;
     background-color: white;
     margin: 0;
@@ -1451,13 +1338,8 @@ main {
       cursor: pointer;
       top: -15px;
       right: -15px;
-      // width: 40px;
-      // height: 40px;
-      // line-height: 1rem;
       font-size: 1rem;
-      // padding: 11px 14px;
       font-weight: bold;
-      // font-size: inherit;
       border: none;
       border-radius: 50%;
       border: 1px solid;
@@ -1471,7 +1353,6 @@ main {
       &:hover {
         background-color: #444;
         border-color: #444;
-        // filter: brightness(0.9);
       }
     }
 
@@ -1531,6 +1412,30 @@ main {
       }
     }
 
+    .n-table {
+      margin: auto;
+      padding: 1rem;
+      background: beige;
+      border: 1px solid $border-color-base;
+      border-radius: 3px;
+
+      .danger {
+        color: rgb(207, 1, 1);
+        font-weight: bold;
+      }
+      td,
+      th {
+        text-align: right;
+      }
+      th:first-child,
+      .n-label {
+        text-align: left;
+        &.indented {
+          padding-left: 0.5rem;
+        }
+      }
+    }
+
     .ingredients {
       max-width: 500px;
       margin: 10px auto;
@@ -1542,33 +1447,17 @@ main {
   }
 }
 
-.n-table {
-  margin: auto;
-  padding: 1rem;
-  background: beige;
-  border: 1px solid $border-color-base;
-  border-radius: 3px;
-
-  .danger {
-    color: rgb(207, 1, 1);
-    font-weight: bold;
-  }
-  td,
-  th {
-    text-align: right;
-  }
-  th:first-child,
-  .n-label {
-    text-align: left;
-    &.indented {
-      padding-left: 0.5rem;
-    }
-  }
-}
-
 figcaption {
   margin-bottom: 5px;
   font-style: italic;
+}
+
+.note {
+  width: 100%;
+  padding: 0 5px;
+  box-sizing: border-box;
+  position: absolute;
+  bottom: 10px;
 }
 
 .off-prod-link {
@@ -1579,13 +1468,5 @@ figcaption {
     text-decoration: underline;
     color: $goud-green;
   }
-}
-
-.note {
-  width: 100%;
-  padding: 0 5px;
-  box-sizing: border-box;
-  position: absolute;
-  bottom: 10px;
 }
 </style>

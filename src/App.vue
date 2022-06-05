@@ -1,32 +1,15 @@
 <template>
-  <MainPage
-    @click="collapseAll()"
-    :hasCollapsed="state.hasCollapsedAll"
-    v-on:open-up="setHasOpen()"
-  />
+  <MainPage />
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive } from "vue";
+import { defineComponent } from "vue";
 import MainPage from "./components/MainPage.vue";
 
 export default defineComponent({
   name: "App",
   components: {
     MainPage,
-  },
-  setup() {
-    const state = reactive({ hasCollapsedAll: true });
-
-    return {
-      state,
-      collapseAll() {
-        state.hasCollapsedAll = true;
-      },
-      setHasOpen() {
-        state.hasCollapsedAll = false;
-      },
-    };
   },
 });
 </script>
@@ -35,7 +18,7 @@ export default defineComponent({
 :root {
   --goud-beige: #f8f9fa;
   background-color: var(--goud-beige);
-  font-size: 16px; //clamp(14px, 1vw, 16px);
+  font-size: 16px;
   overflow-x: hidden;
 }
 body {
@@ -47,7 +30,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  // max-width: 1000px;
   margin: 0 auto 0;
   position: relative;
 }
