@@ -68,7 +68,11 @@
             Options &lt;-|
           </button>
         </div>
-        <div class="field-search" v-if="state.selectedCategory === null">
+        <div
+          class="field-search"
+          v-if="state.selectedCategory === null"
+          :class="{ uppity: !isMobile }"
+        >
           <form @submit.prevent>
             <input
               type="search"
@@ -537,6 +541,7 @@ export default defineComponent({
     const setIsMobile = () => {
       state.isMobile = window.innerWidth < 768;
     };
+    window.onresize = setIsMobile;
 
     const initLoading = () => {
       state.hasExecutedSearch = true;
@@ -908,7 +913,7 @@ header {
   box-sizing: content-box;
   font-size: 16px;
 
-  @media screen and (min-width: 650px) {
+  &.uppity {
     margin-top: -36px;
   }
 
