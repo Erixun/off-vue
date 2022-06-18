@@ -4,7 +4,7 @@
     :class="{
       'no-scroll': state.selectedProduct || hasExpandedCategories,
     }"
-    @click="hideCategories()"
+    @click="hideCategories(), hideOptions()"
   >
     <div class="spinner-backdrop" v-if="state.isGettingFood">
       <div class="spinner"></div>
@@ -12,7 +12,7 @@
 
     <div
       @click.stop
-      class="menu-categories"
+      class="menu menu-left menu-categories"
       ref="menuCategories"
       :class="{ expand: state.canShowCategories }"
     >
@@ -51,6 +51,11 @@
       </ul>
     </div>
 
+    <DrawerOptions
+      :class="{ expand: state.canShowOptions }"
+      @shutDrawer="hideOptions()"
+    />
+
     <header>
       <div class="control-panel">
         <div class="drawer-btns" v-if="!isMobile">
@@ -62,8 +67,7 @@
           </button>
           <button
             class="btn-categories btn-goud lefty"
-            disabled
-            @click.stop="displayCategories()"
+            @click.stop="displayOptions()"
           >
             Options &lt;-|
           </button>
@@ -237,7 +241,7 @@
         </a>
       </p>
     </main>
-    <footer class="bottom-panel">
+    <footer class="bottom-panel" v-if="isMobile || state.pages.length">
       <button
         v-if="isMobile"
         class="btn-categories btn-goud righty"
@@ -278,8 +282,7 @@
       <button
         v-if="isMobile"
         class="btn-categories btn-goud lefty"
-        disabled
-        @click.stop="displayCategories()"
+        @click.stop="displayOptions()"
       >
         Options
       </button>
@@ -481,19 +484,23 @@ import OFFApi from "@/OFFApi/OFFApi";
 import countries from "@/assets/countries.json";
 import categories from "@/assets/categories.json";
 import NullProductsResponse from "@/constant/NullProductsResponse";
+import DrawerOptions from "@/components/DrawerOptions.vue";
+import { options } from "@/store/Options";
 
 export default defineComponent({
+  components: { DrawerOptions },
   setup() {
     const state = reactive({
+      searchTerm: null,
+      previousSearchTerm: "",
       countries: Array<Tag>(),
       selectedCountry: null as null | Tag,
       previousCountry: null as null | Tag,
       canShowCategories: false,
       categories: Array<Tag>(),
       selectedCategory: null as null | Tag,
-      searchTerm: null,
-      previousSearchTerm: "",
       searchCategoryTerm: null as null | string,
+      canShowOptions: false,
       products: Array<Product>(),
       isGettingFood: false,
       hasExecutedSearch: false,
@@ -550,6 +557,7 @@ export default defineComponent({
       const countryId = state.selectedCountry ? state.selectedCountry.id : "";
       const response = await OFF.findProductsBySearchTerm(
         state.searchTerm!,
+        options.state.sortProductsBy,
         page,
         countryId
       ).catch((e) => {
@@ -621,6 +629,9 @@ export default defineComponent({
     const displayCategories = () => {
       state.canShowCategories = true;
     };
+    const displayOptions = () => {
+      state.canShowOptions = true;
+    };
 
     const getProductsByCategory = async (category: Tag, page = 1) => {
       initLoading();
@@ -628,11 +639,23 @@ export default defineComponent({
       state.searchTerm = null;
       state.canShowCategories = false;
       const country_tag = state.selectedCountry?.id ?? "";
-      OFF.findProductsByCategory(category.id, page, country_tag)
+      OFF.findProductsByCategory(
+        category.id,
+        options.state.sortProductsBy,
+        page,
+        country_tag
+      )
         .then((response) => {
-          state.products = response.products.filter(
+          const filteredProducts = response.products.filter(
             (p) => p.product_name && p.image_front_thumb_url
           );
+          if (options.state.sortProductsBy === "nova_group") {
+            state.products = filteredProducts.sort(
+              (a, b) => (a.nova_group ?? 5) - (b.nova_group ?? 5)
+            );
+          } else {
+            state.products = filteredProducts; //.sort((a, b) => (a.nutriscore_grade ?? "") - (b.nutriscore_grade ?? ""));
+          }
           state.products.forEach(
             (p) =>
               (p.brands = Array.from(
@@ -688,6 +711,7 @@ export default defineComponent({
     };
 
     const hideCategories = () => (state.canShowCategories = false);
+    const hideOptions = () => (state.canShowOptions = false);
 
     const resetToDefault = () => {
       state.selectedCategory = null;
@@ -780,7 +804,9 @@ export default defineComponent({
       execSearch,
       filterCategories,
       displayCategories,
+      displayOptions,
       hideCategories,
+      hideOptions,
       getProduct,
       getProductsByCategory,
       handleCountryChange,
@@ -793,7 +819,7 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 $form-width: 400px;
 $border-color-base: #c3c3c3;
 $goud-green: rgb(2, 127, 2);
@@ -1025,12 +1051,11 @@ header {
   }
 }
 
-.menu-categories {
+.menu {
   outline: 1px solid $border-color-base;
   border-radius: 0 4px 4px 0;
   position: absolute;
   z-index: 1234;
-  left: 0;
   top: 0;
   overflow: auto;
   background-color: $goud-green;
@@ -1038,10 +1063,17 @@ header {
   height: -webkit-fill-available;
   max-width: 100%;
   width: 28rem;
-  transform: translateX(-100%);
   transition: all 300ms ease-in;
   pointer-events: none;
 
+  &.menu-left {
+    left: 0;
+    transform: translateX(-100%);
+  }
+  &.menu-right {
+    right: 0;
+    transform: translateX(100%);
+  }
   &.expand {
     transform: translateX(0);
     pointer-events: unset;

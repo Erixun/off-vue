@@ -68,13 +68,18 @@ export default class OFFApi {
 
   findProductsBySearchTerm(
     searchTerm: string,
+    sortProductsBy = "",
     page = 1,
     countries_tags = ""
   ): Promise<ApiTypes.ProductsResponse> {
     const parsedTerm = encodeURIComponent(searchTerm);
 
     return this.request<ApiTypes.ProductsResponse>(
-      `/cgi/search.pl?search_terms=${parsedTerm}&countries_tags=${countries_tags}&page=${page}&page_size=${this.pageSize}&sort_by=${this.sortProductsBy}&search_simple=1&action=process&json=1`
+      `/cgi/search.pl?search_terms=${parsedTerm}&countries_tags=${countries_tags}&page=${page}&page_size=${
+        this.pageSize
+      }&sort_by=${
+        sortProductsBy || this.sortProductsBy
+      }&search_simple=1&action=process&json=1`
     );
   }
 
@@ -87,11 +92,14 @@ export default class OFFApi {
 
   findProductsByCategory(
     category: string,
+    sortProductsBy = "",
     page = 1,
     countries_tags = ""
   ): Promise<ApiTypes.ProductsResponse> {
     return this.request(
-      `/api/v2/search?countries_tags=${countries_tags}&categories_tags_en=${category}&page=${page}&fields=lc,origins_lc,code,product_name,countries,lang,brands,countries_tags,ingredients,ecoscore,nutriscore_data,nutriscore_grade,nova_group,nova_groups_tags,ecoscore_data,ecoscore_grade,ecoscore_score,energy-kcal_100g,categories_tags,image_front_thumb_url,`
+      `/api/v2/search?countries_tags=${countries_tags}&categories_tags_en=${category}&page=${page}&sort_by=${
+        sortProductsBy || this.sortProductsBy
+      }&fields=lc,origins_lc,code,product_name,countries,lang,brands,countries_tags,ingredients,ecoscore,nutriscore_data,nutriscore_grade,nova_group,nova_groups_tags,ecoscore_data,ecoscore_grade,ecoscore_score,energy-kcal_100g,categories_tags,image_front_thumb_url,`
     );
   }
 
