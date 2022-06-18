@@ -484,43 +484,23 @@ import NullProductsResponse from "@/constant/NullProductsResponse";
 
 export default defineComponent({
   setup() {
-    const state = reactive<{
-      countries: Array<Tag>;
-      selectedCountry: null | Tag;
-      previousCountry: null | Tag;
-      canShowCategories: boolean;
-      categories: Array<Tag>;
-      selectedCategory: null | Tag;
-      searchTerm: null;
-      previousSearchTerm: string;
-      searchCategoryTerm: null | string;
-      products: Array<Product>;
-      isGettingFood: boolean;
-      hasExecutedSearch: boolean;
-      allPages: string[];
-      pages: string[];
-      currentPage: number;
-      selectedProduct: null | Product;
-      hasProductInView: boolean;
-      lastRequest: "" | "search" | "category";
-      isMobile: boolean;
-    }>({
+    const state = reactive({
       countries: Array<Tag>(),
-      selectedCountry: null,
-      previousCountry: null,
+      selectedCountry: null as null | Tag,
+      previousCountry: null as null | Tag,
       canShowCategories: false,
       categories: Array<Tag>(),
-      selectedCategory: null,
+      selectedCategory: null as null | Tag,
       searchTerm: null,
       previousSearchTerm: "",
-      searchCategoryTerm: null,
+      searchCategoryTerm: null as null | string,
       products: Array<Product>(),
       isGettingFood: false,
       hasExecutedSearch: false,
-      allPages: [],
-      pages: [],
+      allPages: [] as string[],
+      pages: [] as string[],
       currentPage: 1,
-      selectedProduct: null,
+      selectedProduct: null as null | Product,
       hasProductInView: false,
       lastRequest: "",
       isMobile: true,
@@ -531,7 +511,7 @@ export default defineComponent({
     onBeforeMount(async () => {
       setIsMobile();
       state.categories = categories.tags
-        .filter((t) => t.id.startsWith("en:") && t.products > 1000)
+        .filter((t) => t.id.startsWith("en:"))
         .sort((a, z) => (a.name > z.name ? 1 : -1));
       const response: TagsResponse = countries;
       state.countries = response.tags.sort((a, z) =>
@@ -1059,13 +1039,11 @@ header {
   max-width: 100%;
   width: 28rem;
   transform: translateX(-100%);
-  opacity: 0;
-  transition: all 500ms;
+  transition: all 300ms ease-in;
   pointer-events: none;
 
   &.expand {
     transform: translateX(0);
-    opacity: 1;
     pointer-events: unset;
   }
   .menu-head {
