@@ -1,5 +1,6 @@
 export interface Product {
   nova_group?: number;
+  ecoscore_grade?: string;
   ingredients_text_pl?: string;
   image_nutrition_thumb_url?: string;
   nutrition_score_warning_fruits_vegetables_nuts_estimate_from_ingredients?: number;

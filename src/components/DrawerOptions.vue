@@ -33,7 +33,7 @@
               v-model="options.state.excludeIncompleteProducts"
             />
           </label>
-          <label>
+          <label class="label-score">
             <span>Nutri-score minimum:</span>
             <select
               v-model="options.state.nutriscoreScoreMinimum"
@@ -49,7 +49,7 @@
               </option>
             </select>
           </label>
-          <label>
+          <label class="label-score">
             <span>Eco-score minimum:</span>
             <select
               v-model="options.state.ecoscoreScoreMinimum"
@@ -65,7 +65,7 @@
               </option>
             </select>
           </label>
-          <label>
+          <label class="label-score">
             <span>Nova-group minimum:</span>
             <select
               v-model="options.state.novaGroupMinimum"
@@ -120,49 +120,49 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+$goud-beige: var(--goud-beige);
+$goud-green: var(--goud-green);
 .menu-right {
   border-radius: 4px 0 0 4px;
-  padding-left: 5px;
   text-align: left;
-  color: var(--goud-beige);
   display: flex;
   flex-direction: column;
-}
-.menu-head {
-  display: flex;
-  justify-content: space-between;
-  position: relative;
+  background: $goud-beige;
+  .menu-head {
+    background: $goud-green;
+    color: $goud-beige;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
 
-  h2 {
-    margin: 0;
-    padding-top: 2px;
-    box-sizing: border-box;
-    font-size: 1.5rem;
-    height: 32px;
-    font-weight: bold;
-    text-shadow: 1px 1px #595959;
+    h2 {
+      margin: 0;
+      padding-top: 2px;
+      box-sizing: border-box;
+      font-size: 1.5rem;
+      height: 32px;
+      font-weight: bold;
+      text-shadow: 1px 1px #595959;
+    }
   }
 }
 .menu-body {
-  padding: 0.5rem 1rem;
-  color: var(--goud-beige);
+  padding: 2rem 0.5rem 0 1rem;
+  background-color: var(--goud-beige);
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   row-gap: 1rem;
-  margin-top: 2rem;
 
   h3 {
     margin: 0.5rem 0;
     padding: 0;
     font-size: 1.2rem;
     font-weight: bold;
-    text-shadow: 1px 1px #595959;
-    color: var(--goud-beige);
   }
 
   form {
-    padding-left: 10px;
+    padding-left: 5px;
   }
 
   .form-sort {
@@ -177,11 +177,11 @@ export default defineComponent({
 
       input {
         margin-right: 0.5rem;
-        margin-left: 0.5rem;
+        margin-left: 0.25rem;
         margin-top: 0.5rem;
         margin-bottom: 0.5rem;
-        width: auto;
-        height: auto;
+        width: 1.1rem;
+        height: 1.1rem;
         border: none;
         background: none;
         outline: none;
@@ -197,14 +197,27 @@ export default defineComponent({
     label {
       margin: 0.5rem 0;
       display: flex;
-      align-items: baseline;
+      align-items: center;
+
+      input {
+        margin-right: 0.5rem;
+        margin-left: 0.5rem;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+        width: 1.1rem;
+        height: 1.1rem;
+        border: none;
+        background: none;
+        outline: none;
+        cursor: pointer;
+      }
 
       select {
         margin-left: 0.5rem;
         font-weight: bold;
         color: white;
         text-shadow: 0 0 5px rgb(66, 66, 66);
-        border: 1px solid;
+        border: 1px solid black;
         border-radius: 3px;
         height: 1.5rem;
 

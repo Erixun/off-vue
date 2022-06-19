@@ -79,7 +79,7 @@ export default class OFFApi {
         this.pageSize
       }&sort_by=${
         sortProductsBy || this.sortProductsBy
-      }&search_simple=1&action=process&json=1`
+      }&search_simple=1&action=process&json=true`
     );
   }
 
@@ -94,12 +94,15 @@ export default class OFFApi {
     category: string,
     sortProductsBy = "",
     page = 1,
-    countries_tags = ""
+    countries_tags = "",
+    nutrition_grades_tags = "",
+    nova_groups_tags = "",
+    ecoscore_tags = ""
   ): Promise<ApiTypes.ProductsResponse> {
     return this.request(
       `/api/v2/search?countries_tags=${countries_tags}&categories_tags_en=${category}&page=${page}&sort_by=${
         sortProductsBy || this.sortProductsBy
-      }&fields=lc,origins_lc,code,product_name,countries,lang,brands,countries_tags,ingredients,ecoscore,nutriscore_data,nutriscore_grade,nova_group,nova_groups_tags,ecoscore_data,ecoscore_grade,ecoscore_score,energy-kcal_100g,categories_tags,image_front_thumb_url,`
+      }&nutrition_grades_tags=${nutrition_grades_tags}&nova_groups_tags=${nova_groups_tags}&fields=lc,origins_lc,code,product_name,countries,lang,brands,countries_tags,ingredients,ecoscore,nutriscore_data,nutriscore_grade,nova_group,nova_groups_tags,ecoscore_data,ecoscore_grade,ecoscore_score,energy-kcal_100g,categories_tags,image_front_thumb_url,`
     );
   }
 
@@ -177,17 +180,13 @@ export default class OFFApi {
       ? { "User-Agent": this.userAgent }
       : undefined;
 
-    return fetchTyped<T>(
-      `${this.baseUrl}${apiPath}.json`,
-      { headers },
-      this.abortController
-    );
+    return fetchTyped<T>(`${this.baseUrl}${apiPath}.json`, { headers });
   }
 }
 
 const DefaultOptions: OFFOptions = {
   country: "world",
   sortProductsBy: "nutriscore_score",
-  pageSize: 50,
+  pageSize: 100,
   abortController: new AbortController(),
 };

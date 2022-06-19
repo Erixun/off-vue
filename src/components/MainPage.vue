@@ -573,8 +573,20 @@ export default defineComponent({
 
       state.currentPage = page;
 
-      state.products = response.products.filter(
+      const filteredProducts = response.products.filter(
         (p) => p.product_name && p.nutriscore_grade && p.image_front_thumb_url
+      );
+      const completedProducts = options.state.excludeIncompleteProducts
+        ? excludeIncomplete(filteredProducts)
+        : filteredProducts;
+      state.products = completedProducts.filter(
+        (p) =>
+          (p.nova_group
+            ? options.state.novaGroupMinimum >= p.nova_group
+            : true) &&
+          (p.nutriscore_grade
+            ? options.state.nutriscoreScoreMinimum <= p.nutriscore_grade
+            : true)
       );
       state.products.forEach(
         (p) => (p.brands = p.brands?.split(",").join(", "))
@@ -633,6 +645,18 @@ export default defineComponent({
       state.canShowOptions = true;
     };
 
+    const excludeIncomplete = (products: Product[]) => {
+      return products.filter(isComplete);
+    };
+
+    const isComplete = (product: Product) => {
+      return (
+        product.nova_group &&
+        product.nutriscore_grade !== "unknown" &&
+        product.ecoscore_grade !== "unknown"
+      );
+    };
+
     const getProductsByCategory = async (category: Tag, page = 1) => {
       initLoading();
       state.selectedCategory = category;
@@ -643,7 +667,9 @@ export default defineComponent({
         category.id,
         options.state.sortProductsBy,
         page,
-        country_tag
+        country_tag,
+        options.getNutritionGradesTags(),
+        options.getNovaGroupsTags()
       )
         .then((response) => {
           const filteredProducts = response.products.filter(
@@ -654,7 +680,9 @@ export default defineComponent({
               (a, b) => (a.nova_group ?? 5) - (b.nova_group ?? 5)
             );
           } else {
-            state.products = filteredProducts; //.sort((a, b) => (a.nutriscore_grade ?? "") - (b.nutriscore_grade ?? ""));
+            state.products = options.state.excludeIncompleteProducts
+              ? excludeIncomplete(filteredProducts)
+              : filteredProducts;
           }
           state.products.forEach(
             (p) =>
@@ -728,7 +756,7 @@ export default defineComponent({
       state.hasProductInView = false;
       setTimeout(() => {
         state.selectedProduct = null;
-      }, 200);
+      }, 250);
     };
 
     const describeEcoScore = (score: string) => {
@@ -1084,7 +1112,7 @@ header {
     position: sticky;
     top: 0;
     background-color: inherit;
-    padding: 9px 8px 0;
+    padding: 9px 8px;
 
     .btn-shut-drawer {
       background-color: $btn-x-color;

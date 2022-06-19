@@ -46,6 +46,13 @@ export const options = {
       label: "E",
     },
   ],
+  getNutritionGradesTags: () => {
+    const { nutriscoreScoreMinimum } = options.state;
+    return options.scoreOptions
+      .map((s) => s.value)
+      .filter((s) => s <= nutriscoreScoreMinimum)
+      .join("|");
+  },
   novaGroupOptions: [
     {
       value: 1,
@@ -64,4 +71,11 @@ export const options = {
       label: "4",
     },
   ],
+  getNovaGroupsTags: () => {
+    const { novaGroupMinimum } = options.state;
+    return options.novaGroupOptions
+      .map((s) => s.value)
+      .filter((s) => s <= novaGroupMinimum)
+      .join("|");
+  },
 };
