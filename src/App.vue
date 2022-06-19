@@ -17,6 +17,7 @@ export default defineComponent({
 <style lang="scss">
 :root {
   --goud-beige: #f8f9fa;
+  --goud-green: rgb(2, 127, 2);
   background-color: var(--goud-beige);
   font-size: 16px;
   overflow-x: hidden;
