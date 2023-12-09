@@ -192,19 +192,19 @@
               <div class="scores">
                 <img
                   class="nutriscore-img img-small"
-                  :src="`https://static.openfoodfacts.org/images/attributes/nutriscore-${
+                  :src="`https://static.openfoodfacts.org/images/attributes/dist/nutriscore-${
                     product.nutriscore_grade ?? 'unknown'
                   }.svg`"
                   alt="Nutriscore grade"
                 />
                 <img
                   class="ecoscore-img img-small"
-                  :src="`https://static.openfoodfacts.org/images/attributes/ecoscore-${product.ecoscore_grade}.svg`"
+                  :src="`https://static.openfoodfacts.org/images/attributes/dist/ecoscore-${product.ecoscore_grade}.svg`"
                   alt="Ecocore grade"
                 />
                 <img
                   class="novagroup-img img-small"
-                  :src="`https://static.openfoodfacts.org/images/attributes/nova-group-${
+                  :src="`https://static.openfoodfacts.org/images/attributes/dist/nova-group-${
                     product.nova_group ?? 'unknown'
                   }.svg`"
                   alt="Nova Group"
@@ -311,7 +311,7 @@
         <figure class="figure-nutriscore">
           <img
             class="nutriscore-img"
-            :src="`https://static.openfoodfacts.org/images/attributes/nutriscore-${productNutriscore}.svg`"
+            :src="`https://static.openfoodfacts.org/images/attributes/dist/nutriscore-${productNutriscore}.svg`"
             :alt="'Nutri-Score ' + productNutriscore"
           />
         </figure>
@@ -422,7 +422,7 @@
           <figure class="figure-nova">
             <img
               class="novagroup-img"
-              :src="`https://static.openfoodfacts.org/images/attributes/nova-group-${
+              :src="`https://static.openfoodfacts.org/images/attributes/dist/nova-group-${
                 state.selectedProduct.nova_group ?? 'unknown'
               }.svg`"
               alt=""
@@ -445,7 +445,7 @@
           <figure class="figure-nova">
             <img
               class="ecoscore-img"
-              :src="`https://static.openfoodfacts.org/images/attributes/ecoscore-${state.selectedProduct.ecoscore_grade}.svg`"
+              :src="`https://static.openfoodfacts.org/images/attributes/dist/ecoscore-${state.selectedProduct.ecoscore_grade}.svg`"
               alt=""
             />
             <figcaption class="figc-eco">
@@ -576,21 +576,25 @@ export default defineComponent({
       const filteredProducts = response.products.filter(
         (p) => p.product_name && p.nutriscore_grade && p.image_front_thumb_url
       );
+      console.log(filteredProducts);
       const completedProducts = options.state.excludeIncompleteProducts
         ? excludeIncomplete(filteredProducts)
         : filteredProducts;
-      state.products = completedProducts.filter(
-        (p) =>
-          (p.nova_group
-            ? options.state.novaGroupMinimum >= p.nova_group
-            : true) &&
-          (p.nutriscore_grade
-            ? options.state.nutriscoreScoreMinimum <= p.nutriscore_grade
-            : true)
-      );
-      state.products.forEach(
-        (p) => (p.brands = p.brands?.split(",").join(", "))
-      );
+
+      state.products = completedProducts;
+      //TODO: debug this, yields often yields empty array
+      // state.products = completedProducts.filter(
+      //   (p) =>
+      //     (p.nova_group
+      //       ? options.state.novaGroupMinimum >= p.nova_group
+      //       : true) &&
+      //     (p.nutriscore_grade
+      //       ? options.state.nutriscoreScoreMinimum <= p.nutriscore_grade
+      //       : true)
+      // );
+      // state.products.forEach(
+      //   (p) => (p.brands = p.brands?.split(",").join(", "))
+      // );
 
       getInitialPages(response);
 
