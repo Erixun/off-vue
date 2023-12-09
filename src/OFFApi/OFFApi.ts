@@ -70,7 +70,8 @@ export default class OFFApi {
     searchTerm: string,
     sortProductsBy = "",
     page = 1,
-    countries_tags = ""
+    countries_tags = "",
+    states_tags = "nutrition-facts-completed"
   ): Promise<ApiTypes.ProductsResponse> {
     const parsedTerm = encodeURIComponent(searchTerm);
 
@@ -79,7 +80,7 @@ export default class OFFApi {
         this.pageSize
       }&sort_by=${
         sortProductsBy || this.sortProductsBy
-      }&search_simple=1&action=process&json=true`
+      }&states_tags=${states_tags}search_simple=1&action=process&json=true`
     );
   }
 
