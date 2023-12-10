@@ -80,7 +80,7 @@ export default class OFFApi {
         this.pageSize
       }&sort_by=${
         sortProductsBy || this.sortProductsBy
-      }&states_tags=${states_tags}search_simple=1&action=process&json=true`
+      }&states_tags=${states_tags}&search_simple=1&action=process&json=true`
     );
   }
 
